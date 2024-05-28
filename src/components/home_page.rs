@@ -6,27 +6,28 @@ use tokio::sync::mpsc::UnboundedSender;
 use color_eyre::Result;
 use tui_big_text::{BigText, PixelSize};
 use crate::app::{Action};
-use crate::app::Action::Render;
 use crate::component::Component;
 use ratatui::prelude::*;
 use ratatui::symbols::border;
 use ratatui::widgets::{Block, Borders, List, ListDirection, ListItem, ListState, Padding};
 use ratatui::widgets::block::{Position, Title};
-use crate::ui::centered_rect;
+use crate::app::Action::Render;
+use crate::components::{select_boss_page};
+use crate::utils::{centered_rect};
 
-pub const NAME: &str = "Home";
+pub const NAME: &str = "HomePage";
 
-pub struct Home {
+pub struct HomePage {
     pub name: String,
     pub action_sender: Option<UnboundedSender<Action>>,
     pub menu_select_state: ListState,
 }
 
-impl Home {
+impl HomePage {
     pub fn new() -> Self {
         let mut state = ListState::default();
         state.select(Some(0));
-        Home {
+        HomePage {
             name: NAME.to_string(),
             action_sender: None,
             menu_select_state: state,
@@ -34,7 +35,7 @@ impl Home {
     }
 }
 
-impl Component for Home {
+impl Component for HomePage {
     fn register_action_handler(&mut self, sender: UnboundedSender<Action>) -> Result<()> {
         self.action_sender = Some(sender);
         Ok(())
@@ -47,14 +48,18 @@ impl Component for Home {
                 idx -= 1;
             }
             self.menu_select_state.select(Some(idx));
-            self.action_sender.as_mut().unwrap().send(Render(NAME.to_string()))?;
         }
         if key.code == KeyCode::Down {
             if idx < 3 {
                 idx += 1;
             }
             self.menu_select_state.select(Some(idx));
-            self.action_sender.as_mut().unwrap().send(Render(NAME.to_string()))?;
+        }
+        if key.code == KeyCode::Enter {
+            match idx {
+                0 => { self.action_sender.as_mut().unwrap().send(Render(select_boss_page::NAME.to_string()))?; }
+                _ => {}
+            }
         }
         Ok(())
     }
@@ -70,7 +75,7 @@ impl Component for Home {
             .alignment(Alignment::Center)
             .build()?;
         // Border
-        let instruction = Title::from(" 按键 <Q> 强制退出 ".bold());
+        let instruction = Title::from(" <Enter> 键选择 || <Q> 键强制退出".bold());
         let block = Block::default()
             .title(instruction.alignment(Alignment::Center).position(Position::Bottom))
             .borders(Borders::ALL)

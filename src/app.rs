@@ -36,7 +36,7 @@ impl App {
             terminal,
             fps: 60.0,
             components: HashMap::new(),
-            cur_component: Arc::new(Mutex::new(String::from("Home"))),
+            cur_component: Arc::new(Mutex::new(String::from("HomePage"))),
         };
         return Ok(app);
     }
@@ -100,15 +100,17 @@ impl App {
             while let Ok(action) = self.action_receiver.try_recv() {
                 match action {
                     Action::Render(component_name) => {
-                        if let Some(component) = self.components.get_mut(&component_name) {
-                            self.terminal.draw(|frame| component.draw(frame, frame.size()).unwrap())?;
-                        } else {
-                            eprintln!("Component {} doesn't exist!", component_name);
-                            std::process::exit(1);
-                        }
                         let mut cur_component_name = self.cur_component.lock().unwrap();
                         if component_name != *cur_component_name {
                             *cur_component_name = component_name;
+                            // Because new page needs to get rendered. Clear the queue to delete the state actions
+                            while let Ok(_) = self.action_receiver.try_recv() {}
+                        }
+                        if let Some(component) = self.components.get_mut(&*cur_component_name) {
+                            self.terminal.draw(|frame| component.draw(frame, frame.size()).unwrap())?;
+                        } else {
+                            eprintln!("Component {} doesn't exist!", &*cur_component_name);
+                            std::process::exit(1);
                         }
                     }
                     Action::Quit => {

@@ -1,7 +1,7 @@
 mod app;
 mod component;
 mod components;
-mod ui;
+mod utils;
 
 use std::io::stdout;
 use std::panic;
@@ -10,8 +10,8 @@ use color_eyre::eyre;
 use color_eyre::eyre::Result;
 use crossterm::terminal::LeaveAlternateScreen;
 use crate::app::App;
-use crate::components::home::Home;
-use crate::components::next::Next;
+use crate::components::home_page::HomePage;
+use crate::components::select_boss_page::SelectBossPage;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -26,8 +26,8 @@ async fn main() -> Result<()> {
 async fn tokio_main() -> Result<()> {
     initialize_panic_handler()?;
     let mut app = App::new()?;
-    app.register_component(components::home::NAME.to_string(), Box::new(Home::new()))?;
-    app.register_component(components::next::NAME.to_string(), Box::new(Next::new()))?;
+    app.register_component(components::home_page::NAME.to_string(), Box::new(HomePage::new()))?;
+    app.register_component(components::select_boss_page::NAME.to_string(), Box::new(SelectBossPage::new()))?;
     app.run().await?;
     Ok(())
 }
