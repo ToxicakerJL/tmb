@@ -11,7 +11,7 @@ use crate::component::Component;
 use crate::components::next;
 use ratatui::prelude::*;
 use ratatui::symbols::border;
-use ratatui::widgets::{Block, Borders};
+use ratatui::widgets::{Block, Borders, Padding};
 use ratatui::widgets::block::{Position, Title};
 
 
@@ -51,6 +51,7 @@ impl Component for Home {
             .lines(vec![
                 "Too Many Bones".red().into(),
             ])
+            .alignment(Alignment::Center)
             .build()?;
 
         let instruction = Title::from(" Type <Q> to exit ".bold());
@@ -58,6 +59,7 @@ impl Component for Home {
         let block = Block::default()
             .title(instruction.alignment(Alignment::Center).position(Position::Bottom))
             .borders(Borders::ALL)
+            .padding(Padding::top(1))
             .border_set(border::THICK);
 
         let inner_area = block.inner(f.size());
