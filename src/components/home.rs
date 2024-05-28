@@ -8,25 +8,28 @@ use tui_big_text::{BigText, PixelSize};
 use crate::app::{Action};
 use crate::app::Action::Render;
 use crate::component::Component;
-use crate::components::next;
 use ratatui::prelude::*;
 use ratatui::symbols::border;
-use ratatui::widgets::{Block, Borders, Padding};
+use ratatui::widgets::{Block, Borders, List, ListDirection, ListItem, ListState, Padding};
 use ratatui::widgets::block::{Position, Title};
-
+use crate::ui::centered_rect;
 
 pub const NAME: &str = "Home";
 
 pub struct Home {
     pub name: String,
     pub action_sender: Option<UnboundedSender<Action>>,
+    pub menu_select_state: ListState,
 }
 
 impl Home {
     pub fn new() -> Self {
+        let mut state = ListState::default();
+        state.select(Some(0));
         Home {
             name: NAME.to_string(),
             action_sender: None,
+            menu_select_state: state,
         }
     }
 }
@@ -38,13 +41,26 @@ impl Component for Home {
     }
 
     fn handle_key_events(&mut self, key: KeyEvent) -> Result<()> {
-        if key.code == KeyCode::Right {
-            self.action_sender.as_mut().unwrap().send(Render(next::NAME.to_string()))?;
+        let mut idx = self.menu_select_state.selected().unwrap();
+        if key.code == KeyCode::Up {
+            if idx > 0 {
+                idx -= 1;
+            }
+            self.menu_select_state.select(Some(idx));
+            self.action_sender.as_mut().unwrap().send(Render(NAME.to_string()))?;
+        }
+        if key.code == KeyCode::Down {
+            if idx < 3 {
+                idx += 1;
+            }
+            self.menu_select_state.select(Some(idx));
+            self.action_sender.as_mut().unwrap().send(Render(NAME.to_string()))?;
         }
         Ok(())
     }
 
     fn draw(&mut self, f: &mut Frame<'_>, area: Rect) -> Result<()> {
+        // Banner
         let tmb_banner = BigText::builder()
             .pixel_size(PixelSize::Full)
             .style(Style::new())
@@ -53,18 +69,39 @@ impl Component for Home {
             ])
             .alignment(Alignment::Center)
             .build()?;
-
-        let instruction = Title::from(" Type <Q> to exit ".bold());
-
+        // Border
+        let instruction = Title::from(" 按键 <Q> 强制退出 ".bold());
         let block = Block::default()
             .title(instruction.alignment(Alignment::Center).position(Position::Bottom))
             .borders(Borders::ALL)
             .padding(Padding::top(1))
             .border_set(border::THICK);
+        // Menu
+        let menu_items: Vec<ListItem> = vec![ListItem::new("开始新游戏"), ListItem::new("读取游戏"), ListItem::new("游戏说明"), ListItem::new("退出")];
+
+        let list = List::new(menu_items)
+            .block(Block::bordered().title(Title::from(" 主菜单 ".bold()).alignment(Alignment::Center)))
+            .style(Style::default().fg(Color::White))
+            .highlight_style(Style::default().yellow().bold())
+            .highlight_symbol(" ☠️ ")
+            .repeat_highlight_symbol(true)
+            .direction(ListDirection::TopToBottom);
+
 
         let inner_area = block.inner(f.size());
+
+        // Split the area, top is banner, bottom is menu
+        let layout = Layout::default()
+            .direction(Direction::Vertical)
+            .constraints(vec![
+                Constraint::Percentage(50),
+                Constraint::Percentage(50),
+            ])
+            .split(inner_area);
+
         f.render_widget(block, area);
-        f.render_widget(tmb_banner, inner_area);
+        f.render_widget(tmb_banner, layout[0]);
+        f.render_stateful_widget(list, centered_rect(layout[1], 50, 50), &mut self.menu_select_state);
         Ok(())
     }
 }

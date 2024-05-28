@@ -72,4 +72,5 @@ pub trait Component {
     ///
     /// * `Result<()>` - An Ok result or an error.
     fn draw(&mut self, f: &mut Frame<'_>, area: Rect) -> Result<()>;
+
 }

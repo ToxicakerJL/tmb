@@ -1,6 +1,7 @@
 mod app;
 mod component;
 mod components;
+mod ui;
 
 use std::io::stdout;
 use std::panic;
