@@ -82,6 +82,7 @@ impl App {
             if let Some(e) = self.next_event().await {
                 match e {
                     Event::Key(key) => {
+                        // Special handle to exit the program
                         if key.code == KeyCode::Char('q') {
                             self.action_sender.send(Action::Quit).unwrap()
                         }

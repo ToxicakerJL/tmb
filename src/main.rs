@@ -2,10 +2,12 @@ mod app;
 mod component;
 mod components;
 
+use std::io::stdout;
 use std::panic;
 use color_eyre::config::HookBuilder;
 use color_eyre::eyre;
 use color_eyre::eyre::Result;
+use crossterm::terminal::LeaveAlternateScreen;
 use crate::app::App;
 use crate::components::home::Home;
 use crate::components::next::Next;
@@ -38,10 +40,14 @@ fn initialize_panic_handler() -> Result<()> {
     let (panic_hook, eyre_hook) = HookBuilder::default().into_hooks();
     let panic_hook = panic_hook.into_panic_hook();
     panic::set_hook(Box::new(move |panic_info| {
+        crossterm::execute!(stdout(), LeaveAlternateScreen).unwrap();
+        crossterm::terminal::disable_raw_mode().unwrap();
         panic_hook(panic_info);
     }));
     let eyre_hook = eyre_hook.into_eyre_hook();
     eyre::set_hook(Box::new(move |error: &(dyn std::error::Error + 'static)| {
+        crossterm::execute!(stdout(), LeaveAlternateScreen).unwrap();
+        crossterm::terminal::disable_raw_mode().unwrap();
         eyre_hook(error)
     },
     ))?;
