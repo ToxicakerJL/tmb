@@ -10,6 +10,7 @@ use crate::app::Action;
 use crate::app::Action::Render;
 use crate::component::Component;
 use crate::components::{home_page};
+use crate::core::game_info::TyrantCard;
 
 pub const NAME: &str = "SelectBossPage";
 
@@ -32,7 +33,6 @@ impl SelectBossPage {
 }
 
 impl Component for SelectBossPage {
-
     fn register_action_handler(&mut self, sender: UnboundedSender<Action>) -> color_eyre::Result<()> {
         self.action_sender = Some(sender);
         Ok(())
@@ -60,19 +60,41 @@ impl Component for SelectBossPage {
     }
 
     fn draw(&mut self, f: &mut Frame<'_>, area: Rect) -> color_eyre::Result<()> {
-        let rows = [Row::new(vec!["哥布林国王", "4/5", "8", "12"]),
-            Row::new(vec!["哥布林国王", "4/5", "8", "12"]),
-            Row::new(vec!["哥布林国王", "4/5", "8", "12"]),
-            Row::new(vec!["哥布林国王", "4/5", "8", "12"]),
-            Row::new(vec!["哥布林国王", "4/5", "8", "12"]),
-            Row::new(vec!["哥布林国王", "4/5", "8", "12"]),
-            Row::new(vec!["哥布林国王", "4/5", "8", "12"])];
+        let tyrants = TyrantCard::list();
+        let mut rows: Vec<Row> = Vec::new();
+        for card in tyrants {
+            let mut intro = card.battle_title;
+            intro = intro + "\n-----------\n战斗机制：\n";
+            for m in card.battle_mechanism {
+                intro = intro + m.as_str();
+            }
+            intro = intro + "\n-----------\nBoss技能：\n";
+            for s in card.tyrant_skills {
+                intro = intro + s.as_str();
+            }
+            intro = intro + "\n-----------\nBoss骰子：\n";
+            for d in card.tyrant_die {
+                intro = intro + d.as_str();
+            }
+
+            let desc = card.description.replace("。", "。\n");
+
+            let r = Row::new(vec![card.name,
+                                  desc,
+                                  card.game_length,
+                                  card.min_days.to_string(),
+                                  card.max_days.to_string(),
+                                  card.creatures]).height(6);
+            rows.push(r);
+        }
 
         let widths = [
-            Constraint::Length(20),
-            Constraint::Length(20),
-            Constraint::Length(20),
-            Constraint::Length(20),
+            Constraint::Length(15),
+            Constraint::Max(100),
+            Constraint::Length(15),
+            Constraint::Length(15),
+            Constraint::Length(15),
+            Constraint::Length(40)
         ];
         let block = Block::default()
             .title(Title::from(" 选择Boss ").alignment(Alignment::Center).position(Position::Top))
@@ -85,7 +107,7 @@ impl Component for SelectBossPage {
             .column_spacing(1)
             .style(Style::new().blue())
             .header(
-                Row::new(vec!["Boss", "游戏时长", "最小挑战天数", "最大挑战天数"])
+                Row::new(vec!["Boss", "简介", "游戏时长", "最小挑战天数", "最大挑战天数", "怪物类型"])
                     .style(Style::new().bold())
                     .bottom_margin(1),
             )

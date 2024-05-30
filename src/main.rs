@@ -1,6 +1,7 @@
 mod app;
 mod component;
 mod components;
+mod core;
 mod utils;
 
 use std::io::stdout;
@@ -12,6 +13,7 @@ use crossterm::terminal::LeaveAlternateScreen;
 use crate::app::App;
 use crate::components::home_page::HomePage;
 use crate::components::select_boss_page::SelectBossPage;
+use crate::core::game_info::TyrantCard;
 
 #[tokio::main]
 async fn main() -> Result<()> {
