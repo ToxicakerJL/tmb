@@ -4,6 +4,7 @@ min_days: 6
 max_days: 10
 game_length: 2/6
 battle_title: 沼泽之战
+creatures: 沼泽怪，地精，野兽
 battle_mechanism:
 - 将德雷伦放在1号路径。抽取沼泽类型的反派，并放置在2号和3号路径。1-2人队伍：两个1点沼泽类型反派。3-4人队伍：两个5点沼泽类型反派。
 - BQ：反派点数（1人队伍忽略此项）。

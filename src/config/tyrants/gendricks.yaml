@@ -4,6 +4,7 @@ min_days: 8
 max_days: 10
 game_length: 3/6
 battle_title: 天平之像
+creatures: 沼泽怪，巨魔，鳞片怪，兽人
 battle_mechanism:
 - BQ：反派点数（1人队伍忽略此项）。在BQ顶部添加一个1点狗头人反派。将根德里克斯添加到BQ顶部。
 tyrant_skills:

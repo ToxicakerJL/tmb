@@ -4,6 +4,7 @@ min_days: 10
 max_days: 13
 game_length: 6/6
 battle_title: 最终冲突
+creatures: 沼泽怪，地精，野兽，巨魔，鳞片怪，兽人
 battle_mechanism:
 - BQ：反派数量等于队伍规模。1-2人队伍：使用1点反派。3-4人队伍：使用5点反派。
 - 将达斯特添加到BQ顶部。达斯特将在速度Meter上占据顶部位置。

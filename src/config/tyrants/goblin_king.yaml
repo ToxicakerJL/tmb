@@ -4,6 +4,7 @@ min_days: 8
 max_days: 12
 game_length: 4/6
 battle_title: 王座之战
+creatures: 沼泽怪，巨魔，野兽，巨魔
 battle_mechanism:
 - 在1号路径的远程位置设置一个王座，使用1号路径标记，并给予3点生命值。将地精王（及其生命值）放在王座上。
 - BQ：反派点数（1人队伍忽略此项）。

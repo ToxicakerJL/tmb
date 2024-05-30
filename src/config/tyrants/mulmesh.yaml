@@ -4,6 +4,7 @@ min_days: 6
 max_days: 9
 game_length: 2/6
 battle_title: 午夜战争
+creatures: 沼泽怪，野兽，鳞片怪
 battle_mechanism:
 - BQ：反派点数（1人队伍忽略此项）。将这张卡上的所有反派放置在BQ顶部。将穆尔梅什添加到BQ底部。
 tyrant_skills:

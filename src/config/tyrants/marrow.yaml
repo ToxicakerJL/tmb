@@ -4,6 +4,7 @@ min_days: 10
 max_days: 12
 game_length: 5/6
 battle_title: 烈焰战斧
+creatures: 沼泽怪，地精，鳞片怪，兽人
 battle_mechanism:
 - 将马罗放置在3号路径的远程位置。
 - BQ：反派点数（1人队伍忽略此项）。
