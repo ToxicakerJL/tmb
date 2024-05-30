@@ -1,0 +1,11 @@
+title: 宝珠的语言
+story: 宝珠突然出现在空中，散发出黑色的凶光。起初，它只是悬浮在阻碍进展的泥泞上方。然后，它开口了。没有声音，也不是用Daelore的任何语言。它的话语仿佛无声地漂浮在空气中，却易于理解。在倾盆大雨中逃跑将十分困难，但满足宝珠的要求也将付出代价。
+choices:
+  - description: 没有备选方案！宝珠的微妙心灵控制影响你的决策。
+    action: BQ：反派点数。战斗期间不得使用备选计划。
+    rewards: 每个Gearlock获得1个技能点。每个Gearloc可以抽取1个战利品。
+  - description: 有备选方案C吗？
+    action: BQ：反派点数。每当Gearloc掷出一个骷髅，宝珠对其造成1点伤害。
+    rewards: 每个Gearlock获得2个技能点。每个Gearloc可以抽取1个战利品。
+remark:
+progress: 1
