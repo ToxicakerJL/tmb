@@ -34,7 +34,7 @@ struct ChallengeSuccessfulPopup {
 }
 
 impl Widget for ChallengeSuccessfulPopup {
-    fn render(mut self, area: Rect, buf: &mut Buffer) {
+    fn render(self, area: Rect, buf: &mut Buffer) {
         let larger_area = Rect::new(area.x - 1, area.y - 1, area.width + 1, area.height + 1);
         Clear.render(larger_area, buf);
         let popup_block = Block::default()
@@ -55,7 +55,7 @@ struct TakeBreakPopup {
 }
 
 impl Widget for TakeBreakPopup {
-    fn render(mut self, area: Rect, buf: &mut Buffer) {
+    fn render(self, area: Rect, buf: &mut Buffer) {
         let larger_area = Rect::new(area.x - 1, area.y - 1, area.width + 1, area.height + 1);
         Clear.render(larger_area, buf);
 
@@ -287,7 +287,7 @@ impl Component for GamePage {
             let popup_area = centered_rect(area, 40, 40);
             let mut popup = TakeBreakPopup::default();
             popup.content = self.take_break_popup.1.clone();
-            popup.content = popup.content + "\n\n\n<a> 无操作进入下一天。\n<b> 将当前遭遇卡放置牌堆顶部。\n<c> 找到卡组中的第一个暴君遭遇卡并将其置于顶端。将剩余的卡洗牌并放在下面。\n<d> 将当前遭遇卡洗入牌堆。";
+            popup.content = popup.content + "\n\n\n<a> 无操作进入下一天。\n<b> 将当前遭遇卡放置牌堆顶部。\n<c> 找到卡组中的第一个暴君遭遇卡并将其置于顶端。将剩余的卡洗牌并放在下面。\n<d> 将当前遭遇卡洗入牌堆。\n";
             for (i, card) in self.special_encounters.iter().enumerate() {
                 let code_point = 'e' as u32;
                 let new_code_point = code_point + i as u32;

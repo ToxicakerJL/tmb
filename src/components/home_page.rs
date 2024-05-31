@@ -11,7 +11,7 @@ use ratatui::prelude::*;
 use ratatui::symbols::border;
 use ratatui::widgets::{Block, Borders, List, ListDirection, ListItem, ListState, Padding};
 use ratatui::widgets::block::{Position, Title};
-use crate::app::Action::Render;
+use crate::app::Action::{Quit, Render};
 use crate::components::{select_boss_page};
 use crate::utils::{centered_rect};
 
@@ -58,6 +58,7 @@ impl Component for HomePage {
         if key.code == KeyCode::Enter {
             match idx {
                 0 => { self.action_sender.as_mut().unwrap().send(Render(select_boss_page::NAME.to_string()))?; }
+                1 => { self.action_sender.as_mut().unwrap().send(Quit)?; }
                 _ => {}
             }
         }
@@ -82,7 +83,7 @@ impl Component for HomePage {
             .padding(Padding::top(1))
             .border_set(border::THICK);
         // Menu
-        let menu_items: Vec<ListItem> = vec![ListItem::new("开始新游戏"), ListItem::new("读取游戏"), ListItem::new("游戏说明"), ListItem::new("退出")];
+        let menu_items: Vec<ListItem> = vec![ListItem::new("开始新游戏"), ListItem::new("退出")];
 
         let list = List::new(menu_items)
             .block(Block::bordered().title(Title::from(" 主菜单 ".bold()).alignment(Alignment::Center)))
