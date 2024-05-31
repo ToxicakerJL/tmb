@@ -11,9 +11,9 @@ use color_eyre::eyre;
 use color_eyre::eyre::Result;
 use crossterm::terminal::LeaveAlternateScreen;
 use crate::app::App;
+use crate::components::game_page::GamePage;
 use crate::components::home_page::HomePage;
 use crate::components::select_boss_page::SelectBossPage;
-use crate::core::game_info::TyrantCard;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -30,6 +30,7 @@ async fn tokio_main() -> Result<()> {
     let mut app = App::new()?;
     app.register_component(components::home_page::NAME.to_string(), Box::new(HomePage::new()))?;
     app.register_component(components::select_boss_page::NAME.to_string(), Box::new(SelectBossPage::new()))?;
+    app.register_component(components::game_page::NAME.to_string(), Box::new(GamePage::new()))?;
     app.run().await?;
     Ok(())
 }

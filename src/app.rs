@@ -103,14 +103,17 @@ impl App {
                         let mut cur_component_name = self.cur_component.lock().unwrap();
                         if component_name != *cur_component_name {
                             *cur_component_name = component_name;
-                            // Because new page needs to get rendered. Clear the queue to delete the state actions
-                            while let Ok(_) = self.action_receiver.try_recv() {}
                         }
                         if let Some(component) = self.components.get_mut(&*cur_component_name) {
                             self.terminal.draw(|frame| component.draw(frame, frame.size()).unwrap())?;
                         } else {
                             eprintln!("Component {} doesn't exist!", &*cur_component_name);
                             std::process::exit(1);
+                        }
+                    }
+                    Action::Update(component_name, message) => {
+                        if let Some(component) = self.components.get_mut(&component_name) {
+                            component.update(Action::Update(component_name, message)).unwrap()
                         }
                     }
                     Action::Quit => {
@@ -151,8 +154,9 @@ pub enum Event {
     Key(KeyEvent),
 }
 
-#[derive(PartialEq, Eq)]
+#[derive(PartialEq, Eq, Debug)]
 pub enum Action {
-    Render(String),
+    Render(String),          // component name
     Quit,
+    Update(String, String),  // component name -> message
 }

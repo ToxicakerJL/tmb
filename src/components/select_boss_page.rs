@@ -7,10 +7,10 @@ use ratatui::widgets::{Block, Borders, Clear, Padding, Paragraph, Row, Table, Ta
 use ratatui::widgets::block::{Position, Title};
 use tokio::sync::mpsc::UnboundedSender;
 use crate::app::Action;
-use crate::app::Action::Render;
+use crate::app::Action::{Render, Update};
 use crate::component::Component;
-use crate::components::{home_page};
-use crate::core::game_info::TyrantCard;
+use crate::components::{game_page, home_page};
+use crate::core::game::TyrantCard;
 use crate::utils::centered_rect;
 
 pub const NAME: &str = "SelectBossPage";
@@ -29,7 +29,8 @@ struct BossInfoPopup {
 
 impl Widget for BossInfoPopup {
     fn render(self, area: Rect, buf: &mut Buffer) {
-        Clear.render(area, buf);
+        let larger_area = Rect::new(area.x - 1, area.y - 1, area.width + 1, area.height + 1);
+        Clear.render(larger_area, buf);
         let popup_block = Block::default()
             .title(Title::from(" Boss介绍 ").alignment(Alignment::Center).position(Position::Top))
             .borders(Borders::ALL)
@@ -86,9 +87,9 @@ impl Component for SelectBossPage {
         if key.code == KeyCode::Enter {
             if !self.is_popup {
                 self.is_popup = true;
-            }
-            if self.is_popup {
-                //Todo next page
+            } else if self.is_popup {
+                self.action_sender.as_mut().unwrap().send(Update(game_page::NAME.to_string(), "gendricks".to_string()))?;
+                self.action_sender.as_mut().unwrap().send(Render(game_page::NAME.to_string()))?;
             }
         }
         Ok(())
@@ -154,7 +155,6 @@ impl Component for SelectBossPage {
             .highlight_symbol(" >> ");
 
         f.render_stateful_widget(table, area, &mut self.menu_select_state);
-
         if self.is_popup {
             let popup_area = centered_rect(area, 60, 80);
             let mut popup = BossInfoPopup::default();

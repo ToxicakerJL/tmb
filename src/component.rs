@@ -58,8 +58,8 @@ pub trait Component {
     ///
     /// * `Result<Option<Action>>` - An action to be processed or none.
     #[allow(unused_variables)]
-    fn update(&mut self, action: Action) -> Result<Option<Action>> {
-        Ok(None)
+    fn update(&mut self, action: Action) -> Result<()> {
+        Ok(())
     }
     /// Render the component on the screen. (REQUIRED)
     ///
