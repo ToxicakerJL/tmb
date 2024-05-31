@@ -8,4 +8,4 @@ choices:
     action: BQ：反派点数。战斗开始时，每个Gearloc受到等同于队伍人数的伤害。如果战斗失败，将这次遭遇重新洗入你的遭遇卡组。
     rewards: 每个Gearlock获得2个技能点。获取额外1点进度点。每个Gearlock抽取1个战利品。
 remark:
-progress: 0
+progress: [0,1]

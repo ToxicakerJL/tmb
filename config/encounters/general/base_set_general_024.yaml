@@ -8,4 +8,4 @@ choices:
     action: 每个Gearloc必须参加危险飞镖挑战。至少一个Gearloc获胜才能使队伍取得进展。每个获胜者还会获得1个战利品。
     rewards: 每个获胜者还会获得1个战利品。
 remark:
-progress: 1
+progress: [1,1]

@@ -8,4 +8,4 @@ choices:
     action: 战斗期间，火焰从天而降，每回合开始时对所有Gearlocs造成1点真实伤害。
     rewards: 每个Gearlock获得2个技能点。每个Gearloc可以抽取1个战利品。
 remark:
-progress: 1
+progress: [1,1]

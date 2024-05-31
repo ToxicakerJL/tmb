@@ -8,4 +8,4 @@ choices:
     action: 在战斗的前两回合中，你的队伍不能掷任何除防御骰以外的骰子。
     rewards: 每个Gearlock获得2个技能点。每个Gearloc可以抽取1个战利品。
 remark:
-progress: 1
+progress: [1,1]

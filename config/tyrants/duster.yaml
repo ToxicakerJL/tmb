@@ -1,6 +1,6 @@
 name: 达斯特
 description: 刚刚掌权不久，达斯特在处理伊本事务时似乎有自己的计划。在悄悄暗杀了伊本哈特的前任统治者并将其追随者收为己用之后，她已经积聚了不少追随者。达斯特一直在寻找着什么，始终是个谜。
-min_days: 10
+min_progress: 10
 max_days: 13
 game_length: 6/6
 battle_title: 最终冲突

@@ -121,7 +121,7 @@ impl Component for SelectBossPage {
             let r = Row::new(vec![card.name,
                                   desc,
                                   card.game_length,
-                                  card.min_days.to_string(),
+                                  card.min_progress.to_string(),
                                   card.max_days.to_string(),
                                   card.creatures]).height(6);
             rows.push(r);

@@ -8,4 +8,4 @@ choices:
     action: BQ：反派点数。1-2人队伍：在BQ底部添加一个5点反派。3-4人队伍：在BQ底部添加一个20点反派。当这个反派进入战斗垫时，增加3点初始生命值。
     rewards: 每个Gearlock获得2个技能点。每个Gearlock抽取1个宝藏战利品。获取额外2点进度点。
 remark:
-progress: 0
+progress: [0,2]

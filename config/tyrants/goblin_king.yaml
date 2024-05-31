@@ -1,6 +1,6 @@
 name: 地精王
 description: 地精王本性难测，通过纯粹的恐怖手段紧紧控制着战火尖塔地区。他的追随者极其忠诚，没人敢越雷池一步，生怕背后中了一颗炸弹。
-min_days: 8
+min_progress: 8
 max_days: 12
 game_length: 4/6
 battle_title: 王座之战

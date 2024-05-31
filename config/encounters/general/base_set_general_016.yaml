@@ -8,4 +8,4 @@ choices:
     action: BQ：反派点数。掷一个D6。如果某Gearloc的HP与骰子结果最接，那么他在战斗开始前失去3点生命值（队伍选择平局情况）。
     rewards: 每个Gearlock获得1个技能点。每个Gearloc可以抽取1个战利品。
 remark:
-progress: 1
+progress: [1,1]

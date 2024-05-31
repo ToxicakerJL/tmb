@@ -2,6 +2,7 @@ use std::fs::File;
 use std::io::Read;
 use std::path::PathBuf;
 use rand::{Rng, thread_rng};
+use rand::prelude::SliceRandom;
 use serde::Deserialize;
 use crate::utils::get_project_root_path;
 
@@ -19,7 +20,7 @@ pub struct EncounterCard {
     pub story: String,
     pub choices: Vec<Choice>,
     pub remark: String,
-    pub progress: usize,
+    pub progress: Vec<usize>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -33,7 +34,7 @@ pub struct Choice {
 pub struct TyrantCard {
     pub name: String,
     pub description: String,
-    pub min_days: usize,
+    pub min_progress: usize,
     pub max_days: usize,
     pub game_length: String,
     pub battle_title: String,
@@ -141,13 +142,6 @@ impl EncounterDeck {
         let file_path = get_project_root_path() + TYRANT_CARD_GENERAL_PATH + "/" + tyrant_name + ".yaml";
         let tyrant_card = TyrantCard::new(file_path.as_str()).expect(format!("Tyrant {} doesn't exist", tyrant_name).as_str());
 
-        let mut day1_cards = EncounterCard::list_day1_cards();
-        encounter_cards.push(day1_cards.remove(rng.gen_range(0..day1_cards.len())));
-        let mut day2_cards = EncounterCard::list_day2_cards();
-        encounter_cards.push(day2_cards.remove(rng.gen_range(0..day2_cards.len())));
-        let mut day3_cards = EncounterCard::list_day3_cards();
-        encounter_cards.push(day3_cards.remove(rng.gen_range(0..day3_cards.len())));
-
         let tyrant_encounter_cards = EncounterCard::list_tyrant_encounter_cards(tyrant_name);
         let size = tyrant_card.max_days - tyrant_encounter_cards.len() - 3;
         encounter_cards.extend(tyrant_encounter_cards);
@@ -157,14 +151,23 @@ impl EncounterDeck {
             let pickup = general_encounter_cards.remove(rng.gen_range(0..general_encounter_cards.len()));
             encounter_cards.push(pickup);
         }
+        let mut rng = thread_rng();
+        encounter_cards.shuffle(&mut rng);
+
+        let mut day1_cards = EncounterCard::list_day1_cards();
+        encounter_cards.insert(0, day1_cards.remove(rng.gen_range(0..day1_cards.len())));
+        let mut day2_cards = EncounterCard::list_day2_cards();
+        encounter_cards.insert(1, day2_cards.remove(rng.gen_range(0..day2_cards.len())));
+        let mut day3_cards = EncounterCard::list_day3_cards();
+        encounter_cards.insert(2, day3_cards.remove(rng.gen_range(0..day3_cards.len())));
         EncounterDeck {
             tyrant_card,
             encounter_cards,
         }
     }
 
-    pub fn next_day(&mut self) -> Option<EncounterCard> {
-        self.encounter_cards.pop()
+    pub fn shuffle(&mut self) {
+        let mut rng = thread_rng();
+        self.encounter_cards.shuffle(&mut rng);
     }
-    pub fn shuffle(&mut self) {}
 }

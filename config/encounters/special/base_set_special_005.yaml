@@ -8,4 +8,4 @@ choices:
     action: 在这里进行攻击和防御属性训练尝试将始终无视所有骷髅。
     rewards: 每个Gearlock获得2个技能点。每个Gearlock抽取1个战利品。
 remark:
-progress: 0
+progress: [0,0]

@@ -1,6 +1,6 @@
 name: 穆尔梅什
 description: 曾经是人类，现在是狼人，穆尔梅什对他曾经的身份有着无法满足的渴望。他知道再也无法回头。这种渴望激起对任何阻挡他复仇之路的非伊本戴洛尔人类的愤怒。
-min_days: 6
+min_progress: 6
 max_days: 9
 game_length: 2/6
 battle_title: 午夜战争
