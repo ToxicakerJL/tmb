@@ -9,3 +9,4 @@ choices:
     rewards: 每个Gearloc可以抽取2个战利品，并选择1个保留。每个Gearlock获得1个技能点。
 remark:
 progress: [1,1]
+card_type: day1

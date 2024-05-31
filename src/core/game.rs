@@ -14,16 +14,17 @@ const ENCOUNTER_CARD_SPECIAL_PATH: &str = "/config/encounters/special";
 const ENCOUNTER_CARD_TYRANT_PATH: &str = "/config/encounters/tyrant";
 const TYRANT_CARD_GENERAL_PATH: &str = "/config/tyrants";
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct EncounterCard {
     pub title: String,
     pub story: String,
     pub choices: Vec<Choice>,
     pub remark: String,
     pub progress: Vec<usize>,
+    pub card_type: String
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct Choice {
     pub description: String,
     pub action: String,
@@ -166,8 +167,41 @@ impl EncounterDeck {
         }
     }
 
-    pub fn shuffle(&mut self) {
+    pub fn shuffle(&mut self, shuffle_strategy: ShuffleStrategy, encounter_card: Option<EncounterCard>) {
         let mut rng = thread_rng();
-        self.encounter_cards.shuffle(&mut rng);
+        match shuffle_strategy {
+            ShuffleStrategy::PutCurrentCardTop => {
+                self.encounter_cards.insert(0, encounter_card.expect("Expect the current encounter card!"));
+            }
+            ShuffleStrategy::PutCurrentCardRandom => {
+                let idx = rng.gen_range(0..self.encounter_cards.len());
+                self.encounter_cards.insert(idx, encounter_card.expect("Expect the current encounter card!"));
+            }
+            ShuffleStrategy::FirstTyrantCardTopAndShuffleRest => {
+                let mut i = 0;
+                while i < self.encounter_cards.len() {
+                    if let Some(card) =  self.encounter_cards.get(i) {
+                        if card.card_type == "tyrant" {
+                            break;
+                        }
+                    }
+                    i += 1;
+                }
+                let card = self.encounter_cards.remove(i);
+                self.encounter_cards.shuffle(&mut rng);
+                self.encounter_cards.insert(0, card);
+            }
+            ShuffleStrategy::PickSpecialCardAndShuffle => {
+                self.encounter_cards.push(encounter_card.expect("Expect the special encounter card!"));
+                self.encounter_cards.shuffle(&mut rng);
+            }
+        }
     }
+}
+
+pub enum ShuffleStrategy {
+    PutCurrentCardTop,
+    PutCurrentCardRandom,
+    FirstTyrantCardTopAndShuffleRest,
+    PickSpecialCardAndShuffle,
 }

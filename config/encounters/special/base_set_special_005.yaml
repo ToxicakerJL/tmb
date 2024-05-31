@@ -9,3 +9,4 @@ choices:
     rewards: 每个Gearlock获得2个技能点。每个Gearlock抽取1个战利品。
 remark:
 progress: [0,0]
+card_type: special

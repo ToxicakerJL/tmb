@@ -9,3 +9,4 @@ choices:
     rewards: 每个Gearlock获得2个技能点。每个Gearlock抽取1个战利品。
 remark: 如果战斗失败，将这次遭遇放回遭遇卡组顶部。
 progress: [1,1]
+card_type: day2

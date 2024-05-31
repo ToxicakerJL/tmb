@@ -9,3 +9,4 @@ choices:
     rewards: 每个Gearlock获得2个技能点。每个Gearlock抽取1个宝藏战利品。获取额外2点进度点。
 remark:
 progress: [0,2]
+card_type: special

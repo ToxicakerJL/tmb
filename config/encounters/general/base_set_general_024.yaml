@@ -9,3 +9,4 @@ choices:
     rewards: 每个获胜者还会获得1个战利品。
 remark:
 progress: [1,1]
+card_type: general

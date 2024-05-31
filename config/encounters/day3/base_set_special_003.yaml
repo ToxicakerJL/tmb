@@ -9,3 +9,4 @@ choices:
     rewards: 每个Gearlock获得2个技能点。每个Gearlock抽取1个宝藏战利品。
 remark:
 progress: [2, 1]
+card_type: day3

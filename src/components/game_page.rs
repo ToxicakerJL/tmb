@@ -2,13 +2,14 @@ use crossterm::event::{KeyCode, KeyEvent};
 use ratatui::Frame;
 use ratatui::layout::Rect;
 use ratatui::prelude::*;
-use ratatui::widgets::{Block, Borders, Clear, Padding, Paragraph, Wrap};
+use ratatui::widgets::{Block, Borders, Clear, List, ListDirection, Padding, Paragraph, Wrap};
 use ratatui::widgets::block::{Position, Title};
 use tokio::sync::mpsc::UnboundedSender;
 use tui_big_text::{BigText, PixelSize};
 use crate::app::Action;
 use crate::component::Component;
 use crate::core::game::{EncounterCard, EncounterDeck};
+use crate::core::game::ShuffleStrategy::{FirstTyrantCardTopAndShuffleRest, PickSpecialCardAndShuffle, PutCurrentCardRandom, PutCurrentCardTop};
 use crate::utils::centered_rect;
 
 pub const NAME: &str = "GamePage";
@@ -24,6 +25,7 @@ pub struct GamePage {
     pub finished_encounter_cards: Vec<(EncounterCard, bool)>,
     pub challenge_successful_popup: (bool, usize),
     pub take_break_popup: (bool, String),
+    pub special_encounters: Vec<EncounterCard>,
 }
 
 #[derive(Default)]
@@ -32,7 +34,7 @@ struct ChallengeSuccessfulPopup {
 }
 
 impl Widget for ChallengeSuccessfulPopup {
-    fn render(self, area: Rect, buf: &mut Buffer) {
+    fn render(mut self, area: Rect, buf: &mut Buffer) {
         let larger_area = Rect::new(area.x - 1, area.y - 1, area.width + 1, area.height + 1);
         Clear.render(larger_area, buf);
         let popup_block = Block::default()
@@ -53,14 +55,16 @@ struct TakeBreakPopup {
 }
 
 impl Widget for TakeBreakPopup {
-    fn render(self, area: Rect, buf: &mut Buffer) {
+    fn render(mut self, area: Rect, buf: &mut Buffer) {
         let larger_area = Rect::new(area.x - 1, area.y - 1, area.width + 1, area.height + 1);
         Clear.render(larger_area, buf);
+
         let popup_block = Block::default()
             .borders(Borders::ALL)
             .padding(Padding::new(1, 1, 1, 1))
-            .title(Title::from(" <Enter> 键到下一天 || <A> 挑战Boss").alignment(Alignment::Center).position(Position::Bottom))
+            .title(Title::from(" 任意选择将会进入下一天 || <O> 挑战Boss").alignment(Alignment::Center).position(Position::Bottom))
             .style(Style::default().bg(Color::DarkGray));
+
         Paragraph::new(self.content)
             .wrap(Wrap { trim: true })
             .block(popup_block)
@@ -81,6 +85,7 @@ impl GamePage {
             finished_encounter_cards: Vec::new(),
             challenge_successful_popup: (false, 0),
             take_break_popup: (false, "休息整顿...".to_string()),
+            special_encounters: EncounterCard::list_special_cards(),
         }
     }
 }
@@ -106,21 +111,48 @@ impl Component for GamePage {
         if key.code == KeyCode::Char('y') && self.challenge_successful_popup.0 {
             self.challenge_successful_popup = (false, self.challenge_successful_popup.1);
             self.take_break_popup = (true, "休息整顿...".to_string());
-            let today_card = self.today_card.take().unwrap();
+            let today_card = self.today_card.clone().unwrap();
             self.progress += today_card.progress[self.challenge_successful_popup.1];
             self.finished_encounter_cards.push((today_card, true));
         }
         if key.code == KeyCode::Char('n') && self.challenge_successful_popup.0 {
             self.challenge_successful_popup = (false, self.challenge_successful_popup.1);
             self.take_break_popup = (true, "休息整顿...".to_string());
-            self.finished_encounter_cards.push((self.today_card.take().unwrap(), false));
+            self.finished_encounter_cards.push((self.today_card.clone().unwrap(), false));
         }
-        if key.code == KeyCode::Enter && self.take_break_popup.0 {
-            self.take_break_popup.0 = false;
-            self.should_go_next_day = true;
-            self.days += 1;
+        if self.take_break_popup.0 {
+            let mut next_day = false;
+            if key.code == KeyCode::Char('a') {
+                next_day = true;
+            }
+            if key.code == KeyCode::Char('b') {
+                next_day = true;
+                self.deck.as_mut().unwrap().shuffle(PutCurrentCardTop, self.today_card.clone());
+            }
+            if key.code == KeyCode::Char('c') {
+                next_day = true;
+                self.deck.as_mut().unwrap().shuffle(FirstTyrantCardTopAndShuffleRest, None);
+            }
+            if key.code == KeyCode::Char('d') {
+                next_day = true;
+                self.deck.as_mut().unwrap().shuffle(PutCurrentCardRandom, self.today_card.clone());
+            }
+            for (i, card) in self.special_encounters.iter().enumerate() {
+                let code_point = 'e' as u32;
+                let new_code_point = code_point + i as u32;
+                let new_char = std::char::from_u32(new_code_point).unwrap();
+                if key.code == KeyCode::Char(new_char) {
+                    next_day = true;
+                    self.deck.as_mut().unwrap().shuffle(PickSpecialCardAndShuffle, Some(card.clone()));
+                }
+            }
+            if next_day {
+                self.take_break_popup.0 = false;
+                self.should_go_next_day = true;
+                self.days += 1;
+            }
         }
-        if key.code == KeyCode::Char('a') && self.take_break_popup.0 {
+        if key.code == KeyCode::Char('o') && self.take_break_popup.0 {
             let min_required = self.deck.as_ref().unwrap().tyrant_card.min_progress;
             if self.progress < min_required {
                 self.take_break_popup.1 = format!("无法挑战，最小进度要求: {}, 当前：{}", min_required, self.progress)
@@ -151,6 +183,14 @@ impl Component for GamePage {
             ])
             .split(area);
 
+        let left_layout = Layout::default()
+            .direction(Direction::Vertical)
+            .constraints(vec![
+                Constraint::Percentage(40),
+                Constraint::Percentage(60),
+            ])
+            .split(layout[0]);
+
         let days = String::from("Days: ") + self.days.to_string().as_str();
         let progress = String::from("Progress: ") + self.progress.to_string().as_str();
         // days banner
@@ -164,7 +204,23 @@ impl Component for GamePage {
             .alignment(Alignment::Center)
             .build()?;
 
-        frame.render_widget(days_banner, layout[0]);
+        let mut items = Vec::new();
+        let mut i = 1;
+        for (card, success) in &self.finished_encounter_cards {
+            if *success {
+                let day = format!("✅ 第{}天：{}", i, card.title.clone());
+                items.push(day);
+            } else {
+                let day = format!("❌ 第{}天：{}", i, card.title.clone());
+                items.push(day);
+            }
+            i += 1;
+        }
+        let list = List::new(items)
+            .direction(ListDirection::TopToBottom);
+
+        frame.render_widget(days_banner, left_layout[0]);
+        frame.render_widget(list, centered_rect(left_layout[1], 50, 50));
 
         let deck = self.deck.as_mut().unwrap();
         let mut content = String::new();
@@ -228,9 +284,16 @@ impl Component for GamePage {
         }
 
         if self.take_break_popup.0 {
-            let popup_area = centered_rect(area, 30, 30);
+            let popup_area = centered_rect(area, 40, 40);
             let mut popup = TakeBreakPopup::default();
             popup.content = self.take_break_popup.1.clone();
+            popup.content = popup.content + "\n\n\n<a> 无操作进入下一天。\n<b> 将当前遭遇卡放置牌堆顶部。\n<c> 找到卡组中的第一个暴君遭遇卡并将其置于顶端。将剩余的卡洗牌并放在下面。\n<d> 将当前遭遇卡洗入牌堆。";
+            for (i, card) in self.special_encounters.iter().enumerate() {
+                let code_point = 'e' as u32;
+                let new_code_point = code_point + i as u32;
+                let new_char = std::char::from_u32(new_code_point).unwrap();
+                popup.content += format!("<{}> 将特殊遭遇卡-“{}”洗入牌堆。\n", new_char, card.title).as_str()
+            }
             frame.render_widget(popup, popup_area);
         }
         Ok(())
