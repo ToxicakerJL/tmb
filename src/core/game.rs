@@ -188,9 +188,11 @@ impl EncounterDeck {
                     }
                     i += 1;
                 }
-                let card = self.encounter_cards.remove(i);
-                self.encounter_cards.shuffle(&mut rng);
-                self.encounter_cards.insert(0, card);
+                if i < self.encounter_cards.len() {
+                    let card = self.encounter_cards.remove(i);
+                    self.encounter_cards.shuffle(&mut rng);
+                    self.encounter_cards.insert(0, card);
+                }
             }
             ShuffleStrategy::PickSpecialCardAndShuffle => {
                 self.encounter_cards.push(encounter_card.expect("Expect the special encounter card!"));

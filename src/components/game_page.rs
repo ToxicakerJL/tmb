@@ -292,7 +292,7 @@ impl Component for GamePage {
             let popup_area = centered_rect(area, 40, 40);
             let mut popup = TakeBreakPopup::default();
             popup.content = self.take_break_popup.1.clone();
-            popup.content = popup.content + "\n\n\n<a> 无操作进入下一天。\n<b> 将当前遭遇卡放置牌堆顶部。\n<c> 找到卡组中的第一个暴君遭遇卡并将其置于顶端。将剩余的卡洗牌并放在下面。\n<d> 将当前遭遇卡洗入牌堆。\n<e> 为今天抽取新的遭遇卡，并把当前遭遇卡洗入牌堆。\n";
+            popup.content = popup.content + "\n\n\n<a> 无操作进入下一天。\n<b> 将当前遭遇卡放置牌堆顶部。\n<c> 将卡组中第一个暴君遭遇卡置顶。洗剩余的卡。\n<d> 将当前遭遇卡洗入牌堆。\n<e> 为今天抽取新的遭遇卡，并把当前遭遇卡洗入牌堆。\n";
             for (i, card) in self.special_encounters.iter().enumerate() {
                 let code_point = 'f' as u32;
                 let new_code_point = code_point + i as u32;
