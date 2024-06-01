@@ -3,7 +3,7 @@ story: “啊，终于有阳光和新鲜空气了！我都快忘了地平线是�
 choices:
   - description: 我们就在这里战斗！
     action: BQ：反派点数。你的队伍在战斗中不能使用防御骰。
-    rewards: 每个Gearlock获得3个技能点。每个Gearloc可以抽取1个战利品。
+    rewards: 每个Gearlock获得2个技能点。每个Gearloc可以抽取1个战利品。
   - description: 进入森林！
     action: 在战斗的前两回合中，你的队伍不能掷任何除防御骰以外的骰子。
     rewards: 每个Gearlock获得2个技能点。每个Gearloc可以抽取1个战利品。

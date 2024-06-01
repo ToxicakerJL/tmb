@@ -6,7 +6,7 @@ choices:
     rewards: 每个Gearlock获得1个技能点。获取额外1点进度点。
   - description: 雇佣莫尔诺尔。
     action: 莫尔诺尔出奇地好合作。他们不仅在黑暗掩护下将我们安全送到河东岸，还赠送了一个宝藏战利品“礼物”。也许我们的成功对生意有好处？将特别遭遇——莫尔诺尔商人洗入你的遭遇卡组。
-    rewards: 每个Gearlock获得2个技能点。每个Gearlock抽取1个宝藏战利品。
+    rewards: 每个Gearlock抽取1个宝藏战利品。
 remark:
 progress: [2, 1]
 card_type: day3

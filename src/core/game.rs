@@ -194,7 +194,14 @@ impl EncounterDeck {
             }
             ShuffleStrategy::PickSpecialCardAndShuffle => {
                 self.encounter_cards.push(encounter_card.expect("Expect the special encounter card!"));
-                self.encounter_cards.shuffle(&mut rng);
+                let mut idx = 0;
+                while idx < self.encounter_cards.len() {
+                    if !&self.encounter_cards[idx].card_type.contains("day") {
+                        break;
+                    }
+                    idx += 1;
+                }
+                self.encounter_cards[idx..].shuffle(&mut rng);
             }
             ShuffleStrategy::ReplaceTodayEncounterAndShuffleTodayEncounter => {
                 let mut general_cards = EncounterCard::list_general_cards();
