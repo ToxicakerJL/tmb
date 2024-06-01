@@ -3,7 +3,7 @@ story: 迷雾令人窒息。视野不过几英尺，很容易想象到处都是�
 choices:
   - description: 谁有剩下的沼泽肉？
     action: BQ：反派点数。用活跃或已击败的野兽型反派创建反派队列（尽可能多，然后再使用其他类型）。战斗设置期间，将队员只放置在Gearloc的近战位置。然后，将反派只放置在Gearloc的远程位置（设置完毕后，恢复正常的BQ位置规则）。反派有先发制人。
-    rewards: 每个Gearlock获得2个技能点。每个Gearloc可以抽取1个战利品。
+    rewards: 每个Gearlock获得2个技能点。每个Gearloc可以抽取1个战利品。获取1点进度点。
 remark:
 progress: [1]
 card_type: tyrant

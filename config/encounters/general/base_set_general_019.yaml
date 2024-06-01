@@ -3,10 +3,10 @@ story: 我猛然惊醒。寻找武器时，我意识到它在我睡觉时被偷�
 choices:
   - description: 棍棒和石块会打碎你的骨头！
     action: BQ：反派点数。你的队伍在战斗中不能使用技能骰。任何掷出的骷髅都会被算做两个骷髅。
-    rewards: 每个Gearlock获得2个技能点。每个Gearloc可以抽取1个战利品。
+    rewards: 每个Gearlock获得2个技能点。每个Gearloc可以抽取1个战利品。获取1点进度点。
   - description: 分头行动！找到小偷！
     action: 在第一个占据1号路径的反派被击败之前，你的队伍在战斗中不能使用技能骰。
-    rewards: 每个Gearlock获得2个技能点。每个Gearloc可以抽取1个战利品。
+    rewards: 每个Gearlock获得2个技能点。每个Gearloc可以抽取1个战利品。获取1点进度点。
 remark:
 progress: [1,1]
 card_type: general

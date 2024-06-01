@@ -3,10 +3,10 @@ story: 当你听到荒野动物园的声音、各种战争的喊声，甚至同�
 choices:
   - description: 撬锁挑战！你开锁，你保留！
     action: 浏览宝藏战利品牌堆，直到找到一个至少有一个5难度锁的宝藏战利品。每个Gearloc都有一次撬锁尝试。一个Gearloc打开的锁为下一个Gearloc保持打开状态。队伍必须解锁宝藏战利品才能成功完成此遭遇。
-    rewards: 队伍获得1个宝藏战利品。每个Gearloc可以抽取1个战利品。
+    rewards: 队伍获得1个宝藏战利品。每个Gearloc可以抽取1个战利品。获取1点进度点。
   - description: 危险飞镖......再次来袭。
     action: 每个Gearloc必须参加危险飞镖挑战。至少一个Gearloc获胜才能使队伍取得进展。每个获胜者还会获得1个战利品。
-    rewards: 每个获胜者还会获得1个战利品。
+    rewards: 每个获胜者还会获得1个战利品。获取1点进度点。
 remark:
 progress: [1,1]
 card_type: general

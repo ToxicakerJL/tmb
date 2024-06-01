@@ -3,7 +3,7 @@ story: 从这个高处俯瞰山谷，可以看到两小队兽人。他们分别�
 choices:
   - description: 无论发生什么，这都会很痛苦。
     action: BQ：反派点数。使用尽可能多的兽人类型反派（来自活动或已击败堆叠）创建反派队列。
-    rewards: 每个Gearlock获得2个技能点。每个Gearloc可以抽取1个战利品。
+    rewards: 每个Gearlock获得2个技能点。每个Gearloc可以抽取1个战利品。获取1点进度点。
 remark: 在战斗的前3个回合中，任何被击败的兽人都将被重新加入到BQ的底部。
 progress: [1]
 card_type: tyrant

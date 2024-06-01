@@ -3,10 +3,10 @@ story: 宝珠突然出现在空中，散发出黑色的凶光。起初，它只�
 choices:
   - description: 没有备选方案！宝珠的微妙心灵控制影响你的决策。
     action: BQ：反派点数。战斗期间不得使用备选计划。
-    rewards: 每个Gearlock获得1个技能点。每个Gearloc可以抽取1个战利品。
+    rewards: 每个Gearlock获得1个技能点。每个Gearloc可以抽取1个战利品。获取1点进度点。
   - description: 有备选方案C吗？
     action: BQ：反派点数。每当Gearloc掷出一个骷髅，宝珠对其造成1点伤害。
-    rewards: 每个Gearlock获得2个技能点。每个Gearloc可以抽取1个战利品。
+    rewards: 每个Gearlock获得2个技能点。每个Gearloc可以抽取1个战利品。获取1点进度点。
 remark:
 progress: [1,1]
 card_type: tyrant

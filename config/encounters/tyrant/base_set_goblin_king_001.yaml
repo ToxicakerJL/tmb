@@ -3,10 +3,10 @@ story: 在戴洛尔的路中间发现箱子时，总要保持警惕。这三个�
 choices:
   - description: 我拒绝有哥布林头的臭箱子。忽略那个箱子！决定趁机离开。
     action: BQ：反派点数。
-    rewards: 每个Gearlock获得1个技能点。每个Gearloc可以抽取1个战利品。
+    rewards: 每个Gearlock获得1个技能点。每个Gearloc可以抽取1个战利品。获取1点进度点。
   - description: 尝试拆除！
     action: BQ：反派点数。每个Gearlock必须命名一个锁类型（Lever, Trip, or Force）并通过开锁尝试（达到该类型的3）。如果成功，箱子被拆除，里面的炸弹可以在战斗开始时立即用来摧毁哥布林王的“王座”。（视为战利品，永久）。如果失败，战斗开始前，您的每个Gearlock成员失去2点生命值。
-    rewards: 每个Gearlock获得1个技能点。每个Gearloc可以抽取1个战利品。
+    rewards: 每个Gearlock获得1个技能点。每个Gearloc可以抽取1个战利品。获取1点进度点。
 remark:
 progress: [1,1]
 card_type: tyrant

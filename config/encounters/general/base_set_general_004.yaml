@@ -3,10 +3,10 @@ story: 链条割伤我们的手腕和脚踝，一队雇佣兵押送我们穿过�
 choices:
   - description: 尝试逃跑。
     action: BQ：反派点数。你们队伍的脚镣被锁住了：3L-4T-5F-2T。每个Gearlock将进行一次开锁尝试。一个Gearlock打开的锁保持解锁状态，等待下一个。如果你们队伍打开的锁数量等于队伍人数，这场战斗获得先发制人效果。否则，你们队伍中的每个Gearlock减少2HP，并且必须选择其他选项。
-    rewards: 每个Gearlock获得2个技能点。每个Gearloc可以抽取1个战利品。
+    rewards: 每个Gearlock获得2个技能点。每个Gearloc可以抽取1个战利品。获取1点进度点。
   - description: 双手被绑在背后，用拳头打他们！
     action: BQ：反派点数。Gearlock队伍在这场战斗中必须忽略他们的攻击属性骰子的数值。
-    rewards: 每个Gearlock获得2个技能点。每个Gearloc可以抽取1个战利品。
+    rewards: 每个Gearlock获得2个技能点。每个Gearloc可以抽取1个战利品。获取1点进度点。
 remark:
 progress: [1,1]
 card_type: general

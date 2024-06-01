@@ -3,10 +3,10 @@ story: “回到奥本达把它烧毁。你根本不知道你在招惹什么。�
 choices:
   - description: 别想逃跑！
     action: BQ：反派点数。1-2人队伍：在反派队列顶部添加一个5点兽类反派。3-4人队伍：在反派队列顶部添加两个5点兽类反派。
-    rewards: 每个Gearlock获得1个技能点。每个Gearloc可以抽取1个战利品。
+    rewards: 每个Gearlock获得1个技能点。每个Gearloc可以抽取1个战利品。获取1点进度点。
   - description: 它们有可能是友善的吗？
     action: 你伸出手让最大的狼嗅你：选择1个Gearloc掷一个D6。1-2：狼咬住你的手并带走它。永久减少1个Gearloc的生命值骰子3点（不能低于起始生命值）。3-6：狼被你的大胆震慑住，带着狼群离开。无论结果如何，此遭遇都算成功。
-    rewards: 每个Gearlock获得2个技能点。
+    rewards: 每个Gearlock获得2个技能点。获取1点进度点。
 remark:
 progress: [1,1]
 card_type: tyrant

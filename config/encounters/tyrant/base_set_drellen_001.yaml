@@ -6,7 +6,7 @@ choices:
     rewards: 每个Gearlock获得2个技能点。
   - description: 制作解毒剂！（必须拥有必要成分才能选择）
     action: 从已击败的反派中寻找。如果你拥有上述清单中的每一项成分，你就制作了解毒剂并通过遭遇。如果你没有成分，你必须选择另一种选择。\n1-4人队伍需要：1.Eyes of a bog pole or frog\n2.Mud from a clay golem\n3-4人队伍还需要：1.Fat from a bog lurk\nPowder from a stone golem.\n 解毒剂是持久效果。所有Gearlock在暴君战斗中免疫德雷伦的“毒素增强”。
-    rewards: 每个Gearlock获得1个技能点。
+    rewards: 每个Gearlock获得1个技能点。获取1点进度点。
 remark:
 progress: [0,1]
 card_type: tyrant

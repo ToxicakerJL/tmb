@@ -6,7 +6,7 @@ choices:
     rewards: 每个Gearlock获得1个技能点。每个Gearloc可以抽取1个战利品。获取1个进度点。
   - description: 慢慢撤退… 好吧，赶紧撤！
     action: 诺姆追逐队伍整整一天一夜。你队伍中的每个Gearloc失去2点生命值并且必须跳过恢复阶段。将这张遭遇卡洗回遭遇卡组。
-    rewards: 每个Gearlock获得1个技能点
+    rewards: 每个Gearlock获得1个技能点。
 remark:
 progress: [1, 0]
 card_type: tyrant

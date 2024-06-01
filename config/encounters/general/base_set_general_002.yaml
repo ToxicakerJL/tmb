@@ -3,10 +3,10 @@ story: 一阵微风吹过营地，空气中弥漫着一丝硫磺的气味。随�
 choices:
   - description: 龙来了！我们反击！
     action: BQ：反派点数。第一回合，仅远程Gearlocs行动（跳过所有反派和其他Gearlocs）。1-2人队伍：将一个5点龙反派添加到BQ顶端。3-4人队伍：将一个20点龙反派添加到BQ顶端。如果消灭了一个20点龙，将特殊遭遇——狩猎猎人洗入遭遇卡组中（如果还未加入）。
-    rewards: 每个Gearlock获得3个技能点。每个Gearloc可以抽取1个战利品。
+    rewards: 每个Gearlock获得3个技能点。每个Gearloc可以抽取1个战利品。获取1点进度点。
   - description: 低下头！在地面上战斗！
     action: 战斗期间，火焰从天而降，每回合开始时对所有Gearlocs造成1点真实伤害。
-    rewards: 每个Gearlock获得2个技能点。每个Gearloc可以抽取1个战利品。
+    rewards: 每个Gearlock获得2个技能点。每个Gearloc可以抽取1个战利品。获取1点进度点。
 remark:
 progress: [1,1]
 card_type: general

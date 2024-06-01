@@ -3,10 +3,10 @@ story: 马罗因其军事战术而闻名戴洛尔，但他不愿离开自己的�
 choices:
   - description: 选择狗头人。打倒沼泽生物！
     action: BQ：反派点数。使用正在使用或已击败的沼泽类型反派创建反派队列。
-    rewards: 每个Gearlock获得1个技能点。每个Gearloc可以抽取1个战利品。
+    rewards: 每个Gearlock获得1个技能点。每个Gearloc可以抽取1个战利品。获取1点进度点。
   - description: 选择沼泽生物。让我们消灭这些蜥蜴！
     action: BQ：反派点数。使用正在使用或已击败堆叠的鳞片怪类型反派创建反派队列。
-    rewards: 每个Gearlock获得1个技能点。每个Gearloc可以抽取1个战利品。
+    rewards: 每个Gearlock获得1个技能点。每个Gearloc可以抽取1个战利品。获取1点进度点。
 remark: 今天的战斗只会与一种类型的怪物战斗。如果成功，这种类型的怪物将会在全部战斗中被移除。谨慎选择。
 progress: [1, 1]
 card_type: tyrant

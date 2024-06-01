@@ -3,10 +3,10 @@ story: 回想起来，追踪这条血迹三个小时可能不是个好主意。�
 choices:
   - description: 她是一个Gearloc。我们帮自己人。
     action: 每个Gearloc队员必须为达斯特恢复2HP，Gearloc使用自己拥有治疗能力的战利品。如果无法实现此目标，你必须选择另一选项。
-    rewards: 每个Gearlock获得2个技能点。每个Gearloc可以抽取1个战利品。
+    rewards: 每个Gearlock获得2个技能点。每个Gearloc可以抽取1个战利品。获取1点进度点。
   - description: 如果这是她一直以来的计划呢？这是个陷阱吗？
     action: BQ：反派点数。在思考这个问题时，另一个问题浮现在脑海……她去哪了？
-    rewards: 每个Gearlock获得1个技能点。每个Gearloc可以抽取1个战利品。
+    rewards: 每个Gearlock获得1个技能点。每个Gearloc可以抽取1个战利品。获取1点进度点。
 remark:
 progress: [1,1]
 card_type: tyrant
