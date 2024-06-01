@@ -20,6 +20,7 @@ pub struct SelectBossPage {
     pub action_sender: Option<UnboundedSender<Action>>,
     pub menu_select_state: TableState,
     pub is_popup: bool,
+    pub tyrant_cards: Vec<TyrantCard>
 }
 
 #[derive(Default)]
@@ -53,6 +54,7 @@ impl SelectBossPage {
             action_sender: None,
             menu_select_state: state,
             is_popup: false,
+            tyrant_cards: TyrantCard::list()
         }
     }
 }
@@ -88,7 +90,8 @@ impl Component for SelectBossPage {
             if !self.is_popup {
                 self.is_popup = true;
             } else if self.is_popup {
-                self.action_sender.as_mut().unwrap().send(Update(game_page::NAME.to_string(), "gendricks".to_string()))?;
+                let tyrant_card = self.tyrant_cards.get(idx).unwrap();
+                self.action_sender.as_mut().unwrap().send(Update(game_page::NAME.to_string(), tyrant_card.id.clone()))?;
                 self.action_sender.as_mut().unwrap().send(Render(game_page::NAME.to_string()))?;
             }
         }

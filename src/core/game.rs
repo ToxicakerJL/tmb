@@ -33,6 +33,7 @@ pub struct Choice {
 
 #[derive(Debug, Deserialize)]
 pub struct TyrantCard {
+    pub id: String,
     pub name: String,
     pub description: String,
     pub min_progress: usize,
