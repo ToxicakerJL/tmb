@@ -1,0 +1,12 @@
+title: 制造解毒剂
+story: 如果你不了解情况，你会以为他是奥本达的当地英雄。关于德勒恩·白脸被流放的争议似乎成为了每个人的话题——众说纷纭，谣言四起，但事实却寥寥无几。不为人知的秘密开始在镇上传开——关于粗心实验的秘密。关于致命的混合物和药水。在一家灯光昏暗的酒馆角落，一个当地人递上了一份成分清单。她发誓，在旅途中获取这些成分，将在面对德雷伦时派上用场。是时候利用这份清单，收集一些……相当恶心的成分了。
+choices:
+  - description: 让我们收集一些必要成分！
+    action: BQ：抽取六个1点反派或三个5点反派代替本次战斗的反派点数。将此遭遇重新洗入牌堆。
+    rewards: 每个Gearlock获得2个技能点。
+  - description: 制作解毒剂！（必须拥有必要成分才能选择）
+    action: 从已击败的反派中寻找。如果你拥有上述清单中的每一项成分，你就制作了解毒剂并通过遭遇。如果你没有成分，你必须选择另一种选择。\n1-4人队伍需要：1.Eyes of a bog pole or frog\n2.Mud from a clay golem\n3-4人队伍还需要：1.Fat from a bog lurk\nPowder from a stone golem.\n 解毒剂是持久效果。所有Gearlock在暴君战斗中免疫德雷伦的“毒素增强”。
+    rewards: 每个Gearlock获得1个技能点。
+remark:
+progress: [0,1]
+card_type: tyrant
