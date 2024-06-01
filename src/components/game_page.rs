@@ -9,7 +9,7 @@ use tui_big_text::{BigText, PixelSize};
 use crate::app::Action;
 use crate::component::Component;
 use crate::core::game::{EncounterCard, EncounterDeck};
-use crate::core::game::ShuffleStrategy::{FirstTyrantCardTopAndShuffleRest, PickSpecialCardAndShuffle, PutCurrentCardRandom, PutCurrentCardTop};
+use crate::core::game::ShuffleStrategy::{FirstTyrantCardTopAndShuffleRest, PickSpecialCardAndShuffle, PutCurrentCardRandom, PutCurrentCardTop, ReplaceTodayEncounterAndShuffleTodayEncounter};
 use crate::utils::centered_rect;
 
 pub const NAME: &str = "GamePage";
@@ -137,8 +137,13 @@ impl Component for GamePage {
                 next_day = true;
                 self.deck.as_mut().unwrap().shuffle(PutCurrentCardRandom, self.today_card.clone());
             }
+            if key.code == KeyCode::Char('e') {
+                self.days -= 1;
+                next_day = true;
+                self.deck.as_mut().unwrap().shuffle(ReplaceTodayEncounterAndShuffleTodayEncounter, self.today_card.clone());
+            }
             for (i, card) in self.special_encounters.iter().enumerate() {
-                let code_point = 'e' as u32;
+                let code_point = 'f' as u32;
                 let new_code_point = code_point + i as u32;
                 let new_char = std::char::from_u32(new_code_point).unwrap();
                 if key.code == KeyCode::Char(new_char) {
@@ -287,9 +292,9 @@ impl Component for GamePage {
             let popup_area = centered_rect(area, 40, 40);
             let mut popup = TakeBreakPopup::default();
             popup.content = self.take_break_popup.1.clone();
-            popup.content = popup.content + "\n\n\n<a> 无操作进入下一天。\n<b> 将当前遭遇卡放置牌堆顶部。\n<c> 找到卡组中的第一个暴君遭遇卡并将其置于顶端。将剩余的卡洗牌并放在下面。\n<d> 将当前遭遇卡洗入牌堆。\n";
+            popup.content = popup.content + "\n\n\n<a> 无操作进入下一天。\n<b> 将当前遭遇卡放置牌堆顶部。\n<c> 找到卡组中的第一个暴君遭遇卡并将其置于顶端。将剩余的卡洗牌并放在下面。\n<d> 将当前遭遇卡洗入牌堆。\n<e> 为今天抽取新的遭遇卡，并把当前遭遇卡洗入牌堆。\n";
             for (i, card) in self.special_encounters.iter().enumerate() {
-                let code_point = 'e' as u32;
+                let code_point = 'f' as u32;
                 let new_code_point = code_point + i as u32;
                 let new_char = std::char::from_u32(new_code_point).unwrap();
                 popup.content += format!("<{}> 将特殊遭遇卡-“{}”洗入牌堆。\n", new_char, card.title).as_str()

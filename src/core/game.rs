@@ -196,6 +196,13 @@ impl EncounterDeck {
                 self.encounter_cards.push(encounter_card.expect("Expect the special encounter card!"));
                 self.encounter_cards.shuffle(&mut rng);
             }
+            ShuffleStrategy::ReplaceTodayEncounterAndShuffleTodayEncounter => {
+                let mut general_cards = EncounterCard::list_general_cards();
+                let rand1 = rng.gen_range(1..general_cards.len());
+                let rand2 = rng.gen_range(1..self.encounter_cards.len());
+                self.encounter_cards.insert(0, general_cards.remove(rand1));
+                self.encounter_cards.insert(rand2, encounter_card.expect("Expect the current encounter card!"));
+            }
         }
     }
 }
@@ -205,4 +212,5 @@ pub enum ShuffleStrategy {
     PutCurrentCardRandom,
     FirstTyrantCardTopAndShuffleRest,
     PickSpecialCardAndShuffle,
+    ReplaceTodayEncounterAndShuffleTodayEncounter,
 }
