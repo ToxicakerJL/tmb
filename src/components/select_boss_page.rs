@@ -3,13 +3,15 @@ use ratatui::Frame;
 use ratatui::layout::{Alignment, Rect};
 use ratatui::prelude::*;
 use ratatui::symbols::border;
-use ratatui::widgets::{Block, Borders, Clear, Padding, Paragraph, Row, Table, TableState, Wrap};
+use ratatui::widgets::{Block, Borders, Padding, Row, Table, TableState};
 use ratatui::widgets::block::{Position, Title};
 use tokio::sync::mpsc::UnboundedSender;
+use tracing::info;
 use crate::app::Action;
 use crate::app::Action::{Render, Update};
 use crate::component::Component;
 use crate::components::{game_page, home_page};
+use crate::components::popup::Popup;
 use crate::core::game::{TYRANT_CARDS};
 use crate::utils::centered_rect;
 
@@ -20,28 +22,6 @@ pub struct SelectBossPage {
     pub action_sender: Option<UnboundedSender<Action>>,
     pub menu_select_state: TableState,
     pub is_popup: bool,
-}
-
-#[derive(Default)]
-struct BossInfoPopup {
-    content: String,
-}
-
-impl Widget for BossInfoPopup {
-    fn render(self, area: Rect, buf: &mut Buffer) {
-        let larger_area = Rect::new(area.x - 1, area.y - 1, area.width + 1, area.height + 1);
-        Clear.render(larger_area, buf);
-        let popup_block = Block::default()
-            .title(Title::from(" Boss介绍 ").alignment(Alignment::Center).position(Position::Top))
-            .borders(Borders::ALL)
-            .padding(Padding::new(1, 1, 1, 1))
-            .title(Title::from(" <P> 键回退 || <Enter> 键选择Boss进行游戏 ").alignment(Alignment::Center).position(Position::Bottom))
-            .style(Style::default().bg(Color::DarkGray));
-        Paragraph::new(self.content)
-            .wrap(Wrap { trim: true })
-            .block(popup_block)
-            .render(area, buf);
-    }
 }
 
 impl SelectBossPage {
@@ -65,35 +45,46 @@ impl Component for SelectBossPage {
 
     fn handle_key_events(&mut self, key: KeyEvent) -> color_eyre::Result<()> {
         let mut idx = self.menu_select_state.selected().unwrap();
-        if key.code == KeyCode::Up {
-            if idx > 0 {
-                idx -= 1;
+        let tyrant_cards = TYRANT_CARDS.lock().unwrap();
+        let tyrant_card = tyrant_cards.get(idx).unwrap();
+
+        match self.is_popup {
+            true => {
+                if key.code == KeyCode::Char('p') {
+                    self.is_popup = false;
+                }
+                if key.code == KeyCode::Enter {
+                    self.is_popup = false;
+                    let update = Update(game_page::NAME.to_string(), tyrant_card.id.clone());
+                    let render = Render(game_page::NAME.to_string());
+                    info!("Sending action from {}: {:?}, {:?}", self.name, update, render);
+                    self.action_sender.as_mut().unwrap().send(update)?;
+                    self.action_sender.as_mut().unwrap().send(render)?;
+                }
             }
-            self.menu_select_state.select(Some(idx));
-        }
-        if key.code == KeyCode::Down {
-            if idx < 6 {
-                idx += 1;
-            }
-            self.menu_select_state.select(Some(idx));
-        }
-        if key.code == KeyCode::Char('p') {
-            if !self.is_popup {
-                self.action_sender.as_mut().unwrap().send(Render(home_page::NAME.to_string()))?;
-            } else {
-                self.is_popup = false;
-            }
-        }
-        if key.code == KeyCode::Enter {
-            if !self.is_popup {
-                self.is_popup = true;
-            } else if self.is_popup {
-                let tyrant_cards = TYRANT_CARDS.lock().unwrap();
-                let tyrant_card = tyrant_cards.get(idx).unwrap();
-                self.action_sender.as_mut().unwrap().send(Update(game_page::NAME.to_string(), tyrant_card.id.clone()))?;
-                self.action_sender.as_mut().unwrap().send(Render(game_page::NAME.to_string()))?;
+            false => {
+                if key.code == KeyCode::Up {
+                    if idx > 0 {
+                        idx -= 1;
+                    }
+                    self.menu_select_state.select(Some(idx));
+                }
+                if key.code == KeyCode::Down {
+                    if idx < 6 {
+                        idx += 1;
+                    }
+                    self.menu_select_state.select(Some(idx));
+                }
+                if key.code == KeyCode::Char('p') {
+                    self.action_sender.as_mut().unwrap().send(Render(home_page::NAME.to_string()))?;
+                }
+                if key.code == KeyCode::Enter {
+                    info!("Checking tyrant card info: {}", tyrant_card.name);
+                    self.is_popup = true;
+                }
             }
         }
+
         Ok(())
     }
 
@@ -156,13 +147,14 @@ impl Component for SelectBossPage {
             .highlight_symbol(" >> ");
 
         f.render_stateful_widget(table, area, &mut self.menu_select_state);
+
         if self.is_popup {
             let popup_area = centered_rect(area, 60, 80);
-            let mut popup = BossInfoPopup::default();
             let idx = self.menu_select_state.selected().unwrap();
-            popup.content = boss_intro_list[idx].clone();
-            f.render_widget(popup, popup_area);
+            let boss_info_popup = Popup::new(boss_intro_list[idx].clone(), " Boss介绍 ".to_string(), " <P> 键回退 || <Enter> 键选择Boss进行游戏 ".to_string());
+            f.render_widget(boss_info_popup, popup_area);
         }
+
         Ok(())
     }
 }

@@ -67,7 +67,7 @@ pub fn list_tyrant_encounter_cards() -> HashMap<String, Vec<EncounterCard>> {
     let tyrant_names = [TYRANT_NAME_DUSTER, TYRANT_NAME_NOM, TYRANT_NAME_GENDRICKS, TYRANT_NAME_DRELLEN, TYRANT_NAME_MARROW, TYRANT_NAME_GOBLIN_KING, TYRANT_NAME_MULMESH];
     let mut map = HashMap::new();
     for name in tyrant_names {
-        map.insert(name.to_lowercase(), list_encounter_cards(get_project_root_path() + ENCOUNTER_CARD_TYRANT_PATH, Some(name.to_string())));
+        map.insert(name.to_lowercase(), list_encounter_cards(get_project_root_path() + ENCOUNTER_CARD_TYRANT_PATH, Some(name.to_lowercase())));
     }
     map
 }
