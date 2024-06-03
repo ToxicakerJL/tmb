@@ -1,0 +1,12 @@
+title: 为什么我们不能好好相处？
+story: “那是否意味着我们不能成为朋友？”当一支箭几乎擦着我的左耳飞过时，我开玩笑地说。瘦弱的入侵者只是笑了笑，仿佛他没有理由害怕我们。看着他身后迅速集结的一墙敌人，他或许是对的。要突破这个封锁，我们需要很多蛮力...
+choices:
+  - description: 前线...冲锋！
+    action: BQ：反派点数。队伍必须先消灭所有近战反派，然后才能攻击远程反派。
+    rewards: 每个Gearlock获得2个技能点。每个Gearloc可以抽取1个战利品。获取1点进度点。
+  - description: 保持距离，等待他们崩溃！
+    action: BQ：反派点数。在第1-2轮，近战Gearlocs只能投掷防御骰（不能投掷攻击或技能骰）。在这场战斗中，“近战-远程”混合Gearlocs被视为近战Gearlocs。
+    rewards: 每个Gearlock获得2个技能点。每个Gearlock可以抽取1个战利品。获取1点进度点。
+remark:
+progress: [1,1]
+card_type: general

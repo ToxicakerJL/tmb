@@ -1,0 +1,12 @@
+title: 目标可能看起来更远...
+story: “他在看着我吗？”我担心地说，通过我可靠的望远镜看到一个敌人侦察兵在大约21箭长的距离外。“哦哦！我猜他是在看着我，因为他正准备吹响他的号角！”
+choices:
+  - description: 尝试狙击！
+    action: BQ：反派点数。选择一个Gearlock。该Gearlock必须选择任意数量的攻击骰子（Atk Dice）尝试击败侦察兵。造成2点以上伤害： 减少2点反派分数。造成0-1点伤害： 号角响起！必须选择其他选项。注意：刚刚使用过的攻击骰子在战斗中不能使用！
+    rewards: 每个Gearlock获得2个技能点。每个Gearlock可以抽取2个战利品。获取1点进度点。
+  - description: 让他走。号角响起，很快就听到其他尖锐的回应声音。
+    action: BQ：反派点数。在第2-5轮的开始时，向BQ底部增加一个1点数的反派。
+    rewards: 每个Gearlock获得2个技能点。每个Gearlock可以抽取1个战利品。获取1点进度点。
+remark:
+progress: [1,1]
+card_type: general
