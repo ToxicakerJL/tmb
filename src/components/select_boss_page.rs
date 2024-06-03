@@ -10,7 +10,7 @@ use crate::app::Action;
 use crate::app::Action::{Render, Update};
 use crate::component::Component;
 use crate::components::{game_page, home_page};
-use crate::core::game::TyrantCard;
+use crate::core::game::{TYRANT_CARDS};
 use crate::utils::centered_rect;
 
 pub const NAME: &str = "SelectBossPage";
@@ -20,7 +20,6 @@ pub struct SelectBossPage {
     pub action_sender: Option<UnboundedSender<Action>>,
     pub menu_select_state: TableState,
     pub is_popup: bool,
-    pub tyrant_cards: Vec<TyrantCard>
 }
 
 #[derive(Default)]
@@ -54,7 +53,6 @@ impl SelectBossPage {
             action_sender: None,
             menu_select_state: state,
             is_popup: false,
-            tyrant_cards: TyrantCard::list()
         }
     }
 }
@@ -90,7 +88,8 @@ impl Component for SelectBossPage {
             if !self.is_popup {
                 self.is_popup = true;
             } else if self.is_popup {
-                let tyrant_card = self.tyrant_cards.get(idx).unwrap();
+                let tyrant_cards = TYRANT_CARDS.lock().unwrap();
+                let tyrant_card = tyrant_cards.get(idx).unwrap();
                 self.action_sender.as_mut().unwrap().send(Update(game_page::NAME.to_string(), tyrant_card.id.clone()))?;
                 self.action_sender.as_mut().unwrap().send(Render(game_page::NAME.to_string()))?;
             }
@@ -99,21 +98,20 @@ impl Component for SelectBossPage {
     }
 
     fn draw(&mut self, f: &mut Frame<'_>, area: Rect) -> color_eyre::Result<()> {
-        let tyrants = TyrantCard::list();
         let mut rows: Vec<Row> = Vec::new();
         let mut boss_intro_list = Vec::new();
-        for card in tyrants {
-            let mut intro = card.battle_title;
+        for card in TYRANT_CARDS.lock().unwrap().iter() {
+            let mut intro = card.battle_title.clone();
             intro = intro + "\n------------------\n战斗机制：\n";
-            for m in card.battle_mechanism {
+            for m in card.battle_mechanism.iter() {
                 intro = intro + " *" + m.as_str() + "\n";
             }
             intro = intro + "\n------------------\nBoss技能：\n";
-            for s in card.tyrant_skills {
+            for s in card.tyrant_skills.iter() {
                 intro = intro + " *" + s.as_str() + "\n";
             }
             intro = intro + "\n------------------\nBoss骰子：\n";
-            for d in card.tyrant_die {
+            for d in card.tyrant_die.iter() {
                 intro = intro + " *" + d.as_str() + "\n";
             }
 
@@ -121,12 +119,12 @@ impl Component for SelectBossPage {
 
             let desc = card.description.replace("。", "。\n");
 
-            let r = Row::new(vec![card.name,
+            let r = Row::new(vec![card.name.clone(),
                                   desc,
-                                  card.game_length,
+                                  card.game_length.clone(),
                                   card.min_progress.to_string(),
                                   card.max_days.to_string(),
-                                  card.creatures]).height(6);
+                                  card.creatures.clone()]).height(6);
             rows.push(r);
         }
 

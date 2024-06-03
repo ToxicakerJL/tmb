@@ -13,6 +13,11 @@ use futures::stream::StreamExt;
 use tracing::{debug, info};
 use crate::component::Component;
 
+/// APP is the main engine to run the terminal application. It has UI thread and Data thread.
+/// - UI thread: keyboard event listener and render event generator.
+/// - Data thread: transform events to actions. Execute actions.
+///
+/// This engine makes the dynamic terminal application which renders 60 frames per seconds (FPS).
 pub struct App {
     pub event_receiver: UnboundedReceiver<Event>,
     pub event_sender: UnboundedSender<Event>,

@@ -11,10 +11,14 @@ use ratatui::prelude::*;
 use ratatui::symbols::border;
 use ratatui::widgets::{Block, Borders, List, ListDirection, ListItem, ListState, Padding};
 use ratatui::widgets::block::{Position, Title};
+use tracing::info;
 use crate::app::Action::{Quit, Render};
 use crate::components::{select_boss_page};
 use crate::utils::{centered_rect};
 
+/// Home page for the game. Main menu. Menu items:
+/// - 开始游戏: Start the game. Emit `Render("SelectBossPage")` event to let APP render the next page.
+/// - 退出: exits the application.
 pub const NAME: &str = "HomePage";
 
 pub struct HomePage {
@@ -57,8 +61,14 @@ impl Component for HomePage {
         }
         if key.code == KeyCode::Enter {
             match idx {
-                0 => { self.action_sender.as_mut().unwrap().send(Render(select_boss_page::NAME.to_string()))?; }
-                1 => { self.action_sender.as_mut().unwrap().send(Quit)?; }
+                0 => {
+                    info!("Selected 开始游戏");
+                    self.action_sender.as_mut().unwrap().send(Render(select_boss_page::NAME.to_string()))?;
+                }
+                1 => {
+                    info!("Selected 退出");
+                    self.action_sender.as_mut().unwrap().send(Quit)?;
+                }
                 _ => {}
             }
         }

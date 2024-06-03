@@ -8,7 +8,7 @@ use tokio::sync::mpsc::UnboundedSender;
 use tui_big_text::{BigText, PixelSize};
 use crate::app::Action;
 use crate::component::Component;
-use crate::core::game::{EncounterCard, EncounterDeck};
+use crate::core::game::{EncounterCard, EncounterDeck, SPECIAL_ENCOUNTER_CARDS};
 use crate::core::game::ShuffleStrategy::{FirstTyrantCardTopAndShuffleRest, PickSpecialCardAndShuffle, PutCurrentCardRandom, PutCurrentCardTop, ReplaceTodayEncounterAndShuffleTodayEncounter};
 use crate::utils::centered_rect;
 
@@ -25,7 +25,6 @@ pub struct GamePage {
     pub finished_encounter_cards: Vec<(EncounterCard, bool)>,
     pub challenge_successful_popup: (bool, usize),
     pub take_break_popup: (bool, String),
-    pub special_encounters: Vec<EncounterCard>,
 }
 
 #[derive(Default)]
@@ -85,7 +84,6 @@ impl GamePage {
             finished_encounter_cards: Vec::new(),
             challenge_successful_popup: (false, 0),
             take_break_popup: (false, "休息整顿...".to_string()),
-            special_encounters: EncounterCard::list_special_cards(),
         }
     }
 }
@@ -142,7 +140,7 @@ impl Component for GamePage {
                 next_day = true;
                 self.deck.as_mut().unwrap().shuffle(ReplaceTodayEncounterAndShuffleTodayEncounter, self.today_card.clone());
             }
-            for (i, card) in self.special_encounters.iter().enumerate() {
+            for (i, card) in SPECIAL_ENCOUNTER_CARDS.lock().unwrap().iter().enumerate() {
                 let code_point = 'f' as u32;
                 let new_code_point = code_point + i as u32;
                 let new_char = std::char::from_u32(new_code_point).unwrap();
@@ -293,7 +291,7 @@ impl Component for GamePage {
             let mut popup = TakeBreakPopup::default();
             popup.content = self.take_break_popup.1.clone();
             popup.content = popup.content + "\n\n\n<a> 无操作进入下一天。\n<b> 将当前遭遇卡放置牌堆顶部。\n<c> 将卡组中第一个暴君遭遇卡置顶。洗剩余的卡。\n<d> 将当前遭遇卡洗入牌堆。\n<e> 为今天抽取新的遭遇卡，并把当前遭遇卡洗入牌堆。\n";
-            for (i, card) in self.special_encounters.iter().enumerate() {
+            for (i, card) in SPECIAL_ENCOUNTER_CARDS.lock().unwrap().iter().enumerate() {
                 let code_point = 'f' as u32;
                 let new_code_point = code_point + i as u32;
                 let new_char = std::char::from_u32(new_code_point).unwrap();
