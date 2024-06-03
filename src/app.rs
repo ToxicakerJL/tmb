@@ -10,6 +10,7 @@ use ratatui::Terminal;
 use tokio::sync::mpsc;
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
 use futures::stream::StreamExt;
+use tracing::{debug, info};
 use crate::component::Component;
 
 pub struct App {
@@ -42,6 +43,7 @@ impl App {
     }
 
     pub async fn run(&mut self) -> Result<()> {
+        info!("Starting the application......");
         crossterm::execute!(stdout(), EnterAlternateScreen)?;
         enable_raw_mode()?;
 
@@ -60,13 +62,18 @@ impl App {
                 tokio::select! {
                     _ = next_render => {
                         let val =  _cur_component.lock().unwrap();
-                        _event_sender.send(Event::Render(val.clone())).unwrap();
+                        let event = Event::Render(val.clone());
+                        debug!("UI thread sending event {:?}", &event);
+                        _event_sender.send(event).unwrap();
+
                     }
                     maybe_event = next_event => {
                         match maybe_event {
                             Some(Ok(event)) => {
                                 if let crossterm::event::Event::Key(key) = event {
-                                    _event_sender.send(Event::Key(key)).unwrap()
+                                    let event = Event::Key(key);
+                                    debug!("UI thread sending event {:?}", &event);
+                                    _event_sender.send(event).unwrap()
                                 }
                             }
                             Some(Err(e)) => eprintln!("Error: {:?}\r", e),
@@ -88,21 +95,37 @@ impl App {
                         }
                         let component_name = self.cur_component.lock().unwrap();
                         if let Some(component) = self.components.get_mut(component_name.as_str()) {
+                            debug!("Data thread received event {:?}", &key);
                             component.handle_key_events(key)?;
                         } else {
                             eprintln!("Component {} doesn't exist!", component_name);
                             std::process::exit(1);
                         }
                     }
-                    Event::Render(component_name) => { self.action_sender.send(Action::Render(component_name.clone())).unwrap() }
+                    Event::Render(ref component_name) => {
+                        debug!("Data thread received event {:?}", &e);
+                        self.action_sender.send(Action::Render(component_name.clone())).unwrap()
+                    }
                 }
             }
+
             while let Ok(action) = self.action_receiver.try_recv() {
                 match action {
-                    Action::Render(component_name) => {
+                    Action::Render(ref component_name) => {
+                        debug!("Data thread executing action {:?}", &action);
                         let mut cur_component_name = self.cur_component.lock().unwrap();
-                        if component_name != *cur_component_name {
-                            *cur_component_name = component_name;
+                        if *component_name != *cur_component_name {
+                            debug!("Component changed from {} to {}", &*cur_component_name, component_name);
+                            *cur_component_name = component_name.clone();
+                            // The action here is to change the page to render. Need to clear the event queue that has the old page event.
+                            // The example race condition:
+                            // 2024-06-03T03:28:59.108900Z DEBUG src/app.rs:66: UI thread sending event Render("SelectBossPage")
+                            // 2024-06-03T03:28:59.112023Z DEBUG src/app.rs:114: Data thread executing action Render("GamePage")
+                            // 2024-06-03T03:28:59.112030Z DEBUG src/app.rs:117: Component changed from SelectBossPage to GamePage
+                            // 2024-06-03T03:28:59.123166Z DEBUG src/app.rs:106: Data thread received event Render("SelectBossPage")
+                            // 2024-06-03T03:28:59.123180Z DEBUG src/app.rs:114: Data thread executing action Render("SelectBossPage")
+                            // 2024-06-03T03:28:59.123185Z DEBUG src/app.rs:117: Component changed from GamePage to SelectBossPage
+                            while let Ok(_) = self.event_receiver.try_recv() {}
                         }
                         if let Some(component) = self.components.get_mut(&*cur_component_name) {
                             self.terminal.draw(|frame| component.draw(frame, frame.size()).unwrap())?;
@@ -111,9 +134,10 @@ impl App {
                             std::process::exit(1);
                         }
                     }
-                    Action::Update(component_name, message) => {
-                        if let Some(component) = self.components.get_mut(&component_name) {
-                            component.update(Action::Update(component_name, message)).unwrap()
+                    Action::Update(ref component_name, ref message) => {
+                        debug!("Data thread executing action {:?}", &action);
+                        if let Some(component) = self.components.get_mut(component_name) {
+                            component.update(Action::Update(component_name.clone(), message.clone())).unwrap()
                         }
                     }
                     Action::Quit => {
@@ -129,8 +153,9 @@ impl App {
             eprintln!("Duplicate component name {}", name);
             std::process::exit(1);
         } else {
+            info!("Registering component: {}", &name);
             component.register_action_handler(self.action_sender.clone())?;
-            self.components.insert(name.clone(), component);
+            self.components.insert(name, component);
             Ok(())
         }
     }
@@ -148,7 +173,7 @@ impl App {
     }
 }
 
-#[derive(PartialEq, Eq)]
+#[derive(PartialEq, Eq, Debug)]
 pub enum Event {
     Render(String),
     Key(KeyEvent),

@@ -1,0 +1,4 @@
+2024-06-03T04:06:18.287960Z  INFO src/app.rs:156: Registering component: HomePage
+2024-06-03T04:06:18.289798Z  INFO src/app.rs:156: Registering component: SelectBossPage
+2024-06-03T04:06:18.290420Z  INFO src/app.rs:156: Registering component: GamePage
+2024-06-03T04:06:18.290435Z  INFO src/app.rs:46: Starting the application......
