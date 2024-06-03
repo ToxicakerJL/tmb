@@ -20,8 +20,8 @@ pub const NAME: &str = "SelectBossPage";
 pub struct SelectBossPage {
     pub name: String,
     pub action_sender: Option<UnboundedSender<Action>>,
-    pub menu_select_state: TableState,
-    pub is_popup: bool,
+    menu_select_state: TableState,
+    is_popup: bool,
 }
 
 impl SelectBossPage {
@@ -57,7 +57,7 @@ impl Component for SelectBossPage {
                     self.is_popup = false;
                     let update = Update(game_page::NAME.to_string(), tyrant_card.id.clone());
                     let render = Render(game_page::NAME.to_string());
-                    info!("Sending action from {}: {:?}, {:?}", self.name, update, render);
+                    info!("[{}] Sending action: {:?}, {:?}", self.name, update, render);
                     self.action_sender.as_mut().unwrap().send(update)?;
                     self.action_sender.as_mut().unwrap().send(render)?;
                 }
@@ -79,7 +79,7 @@ impl Component for SelectBossPage {
                     self.action_sender.as_mut().unwrap().send(Render(home_page::NAME.to_string()))?;
                 }
                 if key.code == KeyCode::Enter {
-                    info!("Checking tyrant card info: {}", tyrant_card.name);
+                    info!("[{}] Checking tyrant card info: {}", self.name, tyrant_card.name);
                     self.is_popup = true;
                 }
             }

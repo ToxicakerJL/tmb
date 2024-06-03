@@ -227,9 +227,11 @@ impl EncounterDeck {
         let mut rng = thread_rng();
         match shuffle_strategy {
             ShuffleStrategy::PutCurrentCardTop => {
+                info!("[{:?}] Put {:?} on deck top. Current deck: {:?}", shuffle_strategy, encounter_card, self.encounter_cards);
                 self.encounter_cards.insert(0, encounter_card.expect("Expect the current encounter card!"));
             }
             ShuffleStrategy::PutCurrentCardRandom => {
+                info!("[{:?}] Shuffled {:?} into the encounter deck. Current deck: {:?}", shuffle_strategy, encounter_card, self.encounter_cards);
                 let idx = rng.gen_range(0..self.encounter_cards.len());
                 self.encounter_cards.insert(idx, encounter_card.expect("Expect the current encounter card!"));
             }
@@ -245,11 +247,13 @@ impl EncounterDeck {
                 }
                 if i < self.encounter_cards.len() {
                     let card = self.encounter_cards.remove(i);
+                    info!("[{:?}] Put {:?} on the encounter deck top. Current deck: {:?}", shuffle_strategy, encounter_card, self.encounter_cards);
                     self.encounter_cards.shuffle(&mut rng);
                     self.encounter_cards.insert(0, card);
                 }
             }
             ShuffleStrategy::PickSpecialCardAndShuffle => {
+                info!("[{:?}] Shuffled {:?} into the encounter deck. Current deck: {:?}", shuffle_strategy, encounter_card, self.encounter_cards);
                 self.encounter_cards.push(encounter_card.expect("Expect the special encounter card!"));
                 let mut idx = 0;
                 while idx < self.encounter_cards.len() {
@@ -264,13 +268,16 @@ impl EncounterDeck {
                 let mut general_cards = GENERAL_ENCOUNTER_CARDS.lock().unwrap();
                 let rand1 = rng.gen_range(1..general_cards.len());
                 let rand2 = rng.gen_range(0..self.encounter_cards.len());
+                let replacement = general_cards.remove(rand1);
+                info!("[{:?}] Replaced today's encounter card with {:?}. Shuffled {:?} into the encounter deck. Current deck: {:?}", shuffle_strategy, replacement, encounter_card, self.encounter_cards);
                 self.encounter_cards.insert(rand2, encounter_card.expect("Expect the current encounter card!"));
-                self.encounter_cards.insert(0, general_cards.remove(rand1));
+                self.encounter_cards.insert(0, replacement);
             }
         }
     }
 }
 
+#[derive(Debug)]
 pub enum ShuffleStrategy {
     PutCurrentCardTop,
     PutCurrentCardRandom,

@@ -24,7 +24,7 @@ pub const NAME: &str = "HomePage";
 pub struct HomePage {
     pub name: String,
     pub action_sender: Option<UnboundedSender<Action>>,
-    pub menu_select_state: ListState,
+    menu_select_state: ListState,
 }
 
 impl HomePage {
@@ -62,11 +62,11 @@ impl Component for HomePage {
         if key.code == KeyCode::Enter {
             match idx {
                 0 => {
-                    info!("Selected 开始游戏");
+                    info!("[{}] Selected 开始游戏", self.name);
                     self.action_sender.as_mut().unwrap().send(Render(select_boss_page::NAME.to_string()))?;
                 }
                 1 => {
-                    info!("Selected 退出");
+                    info!("[{}] Selected 退出", self.name);
                     self.action_sender.as_mut().unwrap().send(Quit)?;
                 }
                 _ => {}

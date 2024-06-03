@@ -2,9 +2,10 @@ use crossterm::event::{KeyCode, KeyEvent};
 use ratatui::Frame;
 use ratatui::layout::Rect;
 use ratatui::prelude::*;
-use ratatui::widgets::{Block, Borders, Clear, List, ListDirection, Padding, Paragraph, Wrap};
+use ratatui::widgets::*;
 use ratatui::widgets::block::{Position, Title};
 use tokio::sync::mpsc::UnboundedSender;
+use tracing::info;
 use tui_big_text::{BigText, PixelSize};
 use crate::app::Action;
 use crate::component::Component;
@@ -19,37 +20,22 @@ pub const NAME: &str = "GamePage";
 pub struct GamePage {
     pub name: String,
     pub action_sender: Option<UnboundedSender<Action>>,
-    pub deck: Option<EncounterDeck>,
-    pub days: usize,
-    pub progress: usize,
-    pub today_card: Option<EncounterCard>,
-    pub should_go_next_day: bool,
-    pub finished_encounter_cards: Vec<(EncounterCard, bool)>,
-    pub popup: ShowPopup,
-    pub selected_choice: Option<usize>,
+    deck: Option<EncounterDeck>,    // Built encounter deck
+    days: usize,                    // The current day
+    progress: usize,                // The current progress
+    today_card: Option<EncounterCard>,
+    should_go_next_day: bool,
+    finished_encounter_cards: Vec<EncounterCard>, // The selected choice for the current day
+    popup: ShowPopup, // show the popup dialog
+    selected_choice: Option<usize>, // The selected choice for the current day
+    battle_logs: Vec<BattleLog>,
 }
 
-#[derive(Default)]
-struct TakeBreakPopup {
-    content: String,
-}
-
-impl Widget for TakeBreakPopup {
-    fn render(self, area: Rect, buf: &mut Buffer) {
-        let larger_area = Rect::new(area.x - 1, area.y - 1, area.width + 1, area.height + 1);
-        Clear.render(larger_area, buf);
-
-        let popup_block = Block::default()
-            .borders(Borders::ALL)
-            .padding(Padding::new(1, 1, 1, 1))
-            .title(Title::from(" 任意选择将会进入下一天 || <O> 挑战Boss").alignment(Alignment::Center).position(Position::Bottom))
-            .style(Style::default().bg(Color::DarkGray));
-
-        Paragraph::new(self.content)
-            .wrap(Wrap { trim: true })
-            .block(popup_block)
-            .render(area, buf);
-    }
+struct BattleLog {
+    success: bool,
+    title: String,
+    day: usize,
+    progress: usize,
 }
 
 impl GamePage {
@@ -65,46 +51,60 @@ impl GamePage {
             finished_encounter_cards: Vec::new(),
             popup: NoPopUp,
             selected_choice: None,
+            battle_logs: Vec::new(),
         }
     }
 }
 
 impl Component for GamePage {
     fn handle_key_events(&mut self, key: KeyEvent) -> color_eyre::Result<()> {
-        let choice_num = match self.today_card.as_ref() {
-            None => { 0 }
-            Some(card) => { card.choices.len() }
-        };
         match self.popup {
             NoPopUp => {
                 if key.code == KeyCode::Char('1') {
-                    self.popup = ChallengeSuccessfulPopup;
+                    self.popup = if self.today_card.is_some() { ChallengeSuccessfulPopup } else { NoPopUp };
                     self.selected_choice = Some(0);
+                    info!("[{}] Selected choice 1", self.name);
                 }
                 if key.code == KeyCode::Char('2') {
-                    self.popup = ChallengeSuccessfulPopup;
+                    self.popup = if self.today_card.is_some() { ChallengeSuccessfulPopup } else { NoPopUp };
                     self.selected_choice = Some(1);
+                    info!("[{}] Selected choice 2", self.name);
                 }
                 if key.code == KeyCode::Char('3') {
-                    self.popup = ChallengeSuccessfulPopup;
+                    self.popup = if self.today_card.is_some() { ChallengeSuccessfulPopup } else { NoPopUp };
                     self.selected_choice = Some(2);
+                    info!("[{}] Selected choice 3", self.name);
                 }
             }
             ChallengeSuccessfulPopup => {
                 if key.code == KeyCode::Char('y') {
                     self.popup = BreakPopup(None);
-                    let today_card = self.today_card.take().unwrap();
-                    self.progress += today_card.progress[self.selected_choice.unwrap()];
-                    self.finished_encounter_cards.push((today_card, true));
+                    let today_card = self.today_card.as_ref().unwrap();
+                    let today_progress = today_card.progress[self.selected_choice.unwrap()];
+                    self.progress += today_progress;
+                    info!("[{}] Choice {} challenge successful", self.name, self.selected_choice.unwrap() + 1);
+                    self.battle_logs.push(BattleLog {
+                        success: true,
+                        title: today_card.title.clone(),
+                        day: self.days,
+                        progress: today_progress,
+                    })
                 }
                 if key.code == KeyCode::Char('n') {
                     self.popup = BreakPopup(None);
-                    let today_card = self.today_card.take().unwrap();
-                    self.finished_encounter_cards.push((today_card, false));
+                    let today_card = self.today_card.as_ref().unwrap();
+                    info!("[{}] Choice {} challenge failed", self.name, self.selected_choice.unwrap());
+                    self.battle_logs.push(BattleLog {
+                        success: false,
+                        title: today_card.title.clone(),
+                        day: self.days,
+                        progress: 0,
+                    })
                 }
                 if key.code == KeyCode::Char('p') {
                     self.popup = NoPopUp;
                     self.selected_choice = None;
+                    info!("[{}] Went back", self.name);
                 }
             }
             BreakPopup(_) => {
@@ -114,7 +114,7 @@ impl Component for GamePage {
                 }
                 if key.code == KeyCode::Char('b') {
                     next_day = true;
-                    self.deck.as_mut().unwrap().shuffle(PutCurrentCardTop, self.today_card.clone());
+                    self.deck.as_mut().unwrap().shuffle(PutCurrentCardTop, self.today_card.take());
                 }
                 if key.code == KeyCode::Char('c') {
                     next_day = true;
@@ -122,30 +122,33 @@ impl Component for GamePage {
                 }
                 if key.code == KeyCode::Char('d') {
                     next_day = true;
-                    self.deck.as_mut().unwrap().shuffle(PutCurrentCardRandom, self.today_card.clone());
+                    self.deck.as_mut().unwrap().shuffle(PutCurrentCardRandom, self.today_card.take());
                 }
                 if key.code == KeyCode::Char('e') {
                     self.days -= 1;
                     next_day = true;
-                    self.deck.as_mut().unwrap().shuffle(ReplaceTodayEncounterAndShuffleTodayEncounter, self.today_card.clone());
+                    self.deck.as_mut().unwrap().shuffle(ReplaceTodayEncounterAndShuffleTodayEncounter, self.today_card.take());
                 }
                 if key.code == KeyCode::Char('o') {
+                    info!("[{}] Selected boss challenge", self.name);
                     let min_required = self.deck.as_ref().unwrap().tyrant_card.min_progress;
                     if self.progress < min_required {
-                       self.popup = BreakPopup(Some(format!("无法挑战，最小进度要求: {}, 当前：{}", min_required, self.progress)));
+                        self.popup = BreakPopup(Some(format!("无法挑战，最小进度要求: {}, 当前：{}", min_required, self.progress)));
                     } else {
-                        self.popup = BreakPopup(None);
+                        self.popup = NoPopUp;
                         self.deck.as_mut().unwrap().encounter_cards.clear();
                         self.days += 1;
                     }
                 }
-                for (i, card) in SPECIAL_ENCOUNTER_CARDS.lock().unwrap().iter().enumerate() {
+                let mut special_encounters = SPECIAL_ENCOUNTER_CARDS.lock().unwrap();
+                for (i, _) in special_encounters.iter().enumerate() {
                     let code_point = 'f' as u32;
                     let new_code_point = code_point + i as u32;
                     let new_char = std::char::from_u32(new_code_point).unwrap();
                     if key.code == KeyCode::Char(new_char) {
                         next_day = true;
-                        self.deck.as_mut().unwrap().shuffle(PickSpecialCardAndShuffle, Some(card.clone()));
+                        self.deck.as_mut().unwrap().shuffle(PickSpecialCardAndShuffle, Some(special_encounters.remove(i)));
+                        break;
                     }
                 }
                 if next_day {
@@ -198,67 +201,70 @@ impl Component for GamePage {
             .build()?;
 
         let mut items = Vec::new();
-        let mut i = 1;
-        for (card, success) in &self.finished_encounter_cards {
-            if *success {
-                let day = format!("✅ 第{}天：{}", i, card.title.clone());
+        for log in self.battle_logs.iter() {
+            if log.success {
+                let day = format!("✅ 第{}天：{}  获取进度: {}", log.day, log.title, log.progress);
                 items.push(day);
             } else {
-                let day = format!("❌ 第{}天：{}", i, card.title.clone());
+                let day = format!("❌ 第{}天：{}  获取进度: {}", log.day, log.title, log.progress);
                 items.push(day);
             }
-            i += 1;
         }
         let list = List::new(items)
             .direction(ListDirection::TopToBottom);
 
         frame.render_widget(days_banner, left_layout[0]);
-        frame.render_widget(list, centered_rect(left_layout[1], 50, 50));
+        frame.render_widget(list, left_layout[1]);
 
         let deck = self.deck.as_mut().unwrap();
-        let mut content = String::new();
+        let content;
         if self.days < deck.tyrant_card.max_days && !deck.encounter_cards.is_empty() {
             if self.should_go_next_day {
+                info!("[{}] Went next day.", self.name);
+                match self.today_card.take() {
+                    None => {}
+                    Some(today_card) => { self.finished_encounter_cards.push(today_card) }
+                }
                 let card = deck.encounter_cards.remove(0);
                 self.today_card = Some(card);
                 self.should_go_next_day = false;
             }
             match self.today_card.as_ref() {
-                None => { content += "......"; }
+                None => {
+                    let card = self.finished_encounter_cards.last().unwrap();
+                    content = build_encounter_content(card, self.days);
+                }
                 Some(card) => {
-                    content = content + format!("第{}天：", self.days).as_str() + card.title.as_str() + "\n\n-------------------------------------\n\n";
-                    content = content + card.story.as_str() + "\n\n-------------------------------------\n\n";
-                    content = content + "选择：\n\n";
-                    for c in &card.choices {
-                        content = content + "*" + c.description.as_str() + "\n";
-                        content = content + "行动：" + c.action.as_str() + "\n";
-                        content = content + "奖励：" + c.rewards.as_str() + "\n\n";
-                    }
-                    content = content + card.remark.as_str() + "\n\n";
-                    content = content + "进度：\n";
-                    for (idx, p) in card.progress.iter().enumerate() {
-                        content = content + format!("* 选择{}：获取{}进度。\n", idx + 1, p).as_str();
-                    }
+                    content = build_encounter_content(card, self.days);
                 }
             }
         } else {
+            match self.today_card.take() {
+                None => {}
+                Some(today_card) => { self.finished_encounter_cards.push(today_card) }
+            }
+
             let card = &self.deck.as_ref().unwrap().tyrant_card;
-            let mut intro = card.battle_title.clone();
-            intro = intro + "\n------------------\n";
-            intro = intro + card.description.as_str();
-            intro = intro + "\n------------------\n战斗机制：\n";
-            for m in &card.battle_mechanism {
-                intro = intro + " *" + m.as_str() + "\n";
+            if self.progress >= card.min_progress {
+                let mut intro = "Boss战：".to_string() + card.battle_title.as_str();
+                intro = intro + "\n------------------\n";
+                intro = intro + card.description.as_str();
+                intro = intro + "\n------------------\n战斗机制：\n";
+                for m in &card.battle_mechanism {
+                    intro = intro + " *" + m.as_str() + "\n";
+                }
+                intro = intro + "\n------------------\nBoss技能：\n";
+                for s in &card.tyrant_skills {
+                    intro = intro + " *" + s.as_str() + "\n";
+                }
+                intro = intro + "\n------------------\nBoss骰子：\n";
+                for d in &card.tyrant_die {
+                    intro = intro + " *" + d.as_str() + "\n";
+                }
+                content = intro;
+            } else {
+                content = format!("游戏结束。进度点没有达到要求 {}", card.min_progress);
             }
-            intro = intro + "\n------------------\nBoss技能：\n";
-            for s in &card.tyrant_skills {
-                intro = intro + " *" + s.as_str() + "\n";
-            }
-            intro = intro + "\n------------------\nBoss骰子：\n";
-            for d in &card.tyrant_die {
-                intro = intro + " *" + d.as_str() + "\n";
-            }
-            content = intro;
         }
 
         let instruction = Title::from(" <1> 第一个选择 || <2> 第二个选择 || <3> 第三个选择 || <Q> 强制退出 ".bold());
@@ -297,6 +303,24 @@ impl Component for GamePage {
 
         Ok(())
     }
+}
+
+fn build_encounter_content(card: &EncounterCard, days: usize) -> String {
+    let mut content = String::new();
+    content = content + format!("第{}天：", days).as_str() + card.title.as_str() + "\n\n-------------------------------------\n\n";
+    content = content + card.story.as_str() + "\n\n-------------------------------------\n\n";
+    content = content + "选择：\n\n";
+    for c in &card.choices {
+        content = content + "*" + c.description.as_str() + "\n";
+        content = content + "行动：" + c.action.as_str() + "\n";
+        content = content + "奖励：" + c.rewards.as_str() + "\n\n";
+    }
+    content = content + card.remark.as_str() + "\n\n";
+    content = content + "进度：\n";
+    for (idx, p) in card.progress.iter().enumerate() {
+        content = content + format!("* 选择{}：获取{}进度。\n", idx + 1, p).as_str();
+    }
+    content
 }
 
 enum ShowPopup {
