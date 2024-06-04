@@ -275,6 +275,20 @@ impl EncounterDeck {
             }
         }
     }
+
+    pub fn rollback(&mut self, finished_encounter_cards: &mut Vec<EncounterCard>, day: usize) {
+        if day <= finished_encounter_cards.len() {
+            info!("Started rolling back encounter cards to day {}", day);
+            let mut i = finished_encounter_cards.len();
+            while i >= day {
+                let card = finished_encounter_cards.pop().unwrap();
+                info!("Insert {} day card: {:?}", i, card);
+                self.encounter_cards.insert(0, card);
+                i -= 1;
+            }
+            info!("Finished encounter deck rollback. Current encounter deck: {:?}", self.encounter_cards);
+        }
+    }
 }
 
 #[derive(Debug)]

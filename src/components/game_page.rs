@@ -69,19 +69,43 @@ impl Component for GamePage {
             NoPopUp => {
                 let mut idx = self.menu_select_state.selected().unwrap();
                 if key.code == KeyCode::Char('1') {
-                    self.popup = if self.today_card.is_some() { ChallengeSuccessfulPopup } else { NoPopUp };
-                    self.selected_choice = Some(0);
-                    info!("[{}] Selected choice 1", self.name);
+                    self.popup = if let Some(ref card) = self.today_card {
+                        if card.choices.len() >= 1 {
+                            self.selected_choice = Some(0);
+                            info!("[{}] Selected choice 1", self.name);
+                            ChallengeSuccessfulPopup
+                        } else {
+                            NoPopUp
+                        }
+                    } else {
+                        NoPopUp
+                    }
                 }
                 if key.code == KeyCode::Char('2') {
-                    self.popup = if self.today_card.is_some() { ChallengeSuccessfulPopup } else { NoPopUp };
-                    self.selected_choice = Some(1);
-                    info!("[{}] Selected choice 2", self.name);
+                    self.popup = if let Some(ref card) = self.today_card {
+                        if card.choices.len() >= 2 {
+                            self.selected_choice = Some(1);
+                            info!("[{}] Selected choice 2", self.name);
+                            ChallengeSuccessfulPopup
+                        } else {
+                            NoPopUp
+                        }
+                    } else {
+                        NoPopUp
+                    }
                 }
                 if key.code == KeyCode::Char('3') {
-                    self.popup = if self.today_card.is_some() { ChallengeSuccessfulPopup } else { NoPopUp };
-                    self.selected_choice = Some(2);
-                    info!("[{}] Selected choice 3", self.name);
+                    self.popup = if let Some(ref card) = self.today_card {
+                        if card.choices.len() >= 3 {
+                            self.selected_choice = Some(2);
+                            info!("[{}] Selected choice 3", self.name);
+                            ChallengeSuccessfulPopup
+                        } else {
+                            NoPopUp
+                        }
+                    } else {
+                        NoPopUp
+                    }
                 }
                 if key.code == KeyCode::Up {
                     if idx > 0 {
@@ -94,6 +118,22 @@ impl Component for GamePage {
                         idx += 1;
                     }
                     self.menu_select_state.select(Some(idx));
+                }
+                if key.code == KeyCode::Enter {
+                    let day = idx + 1;
+                    info!("[{}] Selected rollback to day {}", self.name, day);
+                    self.finished_encounter_cards.push(self.today_card.take().unwrap());
+                    self.deck.as_mut().unwrap().rollback(&mut self.finished_encounter_cards, day);
+                    let mut i = self.battle_logs.len();
+                    while i >= day {
+                        let log = self.battle_logs.pop().unwrap();
+                        info!("[{}] Removed battle log {:?}", self.name, log);
+                        i -= 1;
+                        self.progress -= log.progress;
+                    }
+                    self.days = day;
+                    self.today_card = Some(self.deck.as_mut().unwrap().encounter_cards.remove(0));
+                    info!("[{}] Finished rollback to day {}", self.name, day);
                 }
             }
             ChallengeSuccessfulPopup => {
@@ -222,11 +262,12 @@ impl Component for GamePage {
         let content;
         if self.days < deck.tyrant_card.max_days && !deck.encounter_cards.is_empty() {
             if self.should_go_next_day {
-                info!("[{}] Went next day.", self.name);
+
                 match self.today_card.take() {
                     None => {}
                     Some(today_card) => { self.finished_encounter_cards.push(today_card) }
                 }
+                info!("[{}] Went to day {}. Finished encounter deck: {:?}.", self.name, self.days, self.finished_encounter_cards);
                 let card = deck.encounter_cards.remove(0);
                 self.today_card = Some(card);
                 self.should_go_next_day = false;
@@ -341,9 +382,9 @@ fn build_battle_log_menu(battle_log: &Vec<BattleLog>) -> Table {
     let widths = [
         Constraint::Length(10),
         Constraint::Length(20),
-        Constraint::Max(100),
+        Constraint::Max(50),
         Constraint::Length(10),
-        Constraint::Max(100),
+        Constraint::Max(200),
         Constraint::Length(10)
     ];
 
