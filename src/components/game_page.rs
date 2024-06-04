@@ -39,9 +39,6 @@ struct BattleLog {
     title: String,
     day: usize,
     progress: usize,
-    sp: usize,
-    chest_num: usize,
-    trove_chest_num: usize,
     choice: Choice,
 }
 
@@ -111,9 +108,6 @@ impl Component for GamePage {
                         title: today_card.title.clone(),
                         day: self.days,
                         progress: today_progress,
-                        sp: 0,
-                        chest_num: 0,
-                        trove_chest_num: 0,
                         choice: today_card.choices[self.selected_choice.unwrap()].clone(),
                     })
                 }
@@ -124,6 +118,7 @@ impl Component for GamePage {
                     let mut log = BattleLog::default();
                     log.title = today_card.title.clone();
                     log.day = self.days;
+                    log.choice = today_card.choices[self.selected_choice.unwrap()].clone();
                     self.battle_logs.push(log);
                 }
                 if key.code == KeyCode::Char('p') {
@@ -339,10 +334,8 @@ fn build_battle_log_menu(battle_log: &Vec<BattleLog>) -> Table {
                               log.title.clone(),
                               log.choice.description.clone(),
                               log.progress.to_string(),
-                              log.sp.to_string(),
-                              log.chest_num.to_string(),
-                              log.trove_chest_num.to_string(),
-                              if log.success { "✅".to_string() } else { "❌".to_string() }]).height(1);
+                              if log.success { log.choice.rewards.clone() } else { "无奖励".to_string() },
+                              if log.success { "✅".to_string() } else { "❌".to_string() }]).height(2);
         rows.push(r);
     }
     let widths = [
@@ -350,9 +343,7 @@ fn build_battle_log_menu(battle_log: &Vec<BattleLog>) -> Table {
         Constraint::Length(20),
         Constraint::Max(100),
         Constraint::Length(10),
-        Constraint::Length(20),
-        Constraint::Length(20),
-        Constraint::Length(20),
+        Constraint::Max(100),
         Constraint::Length(10)
     ];
 
@@ -366,7 +357,7 @@ fn build_battle_log_menu(battle_log: &Vec<BattleLog>) -> Table {
         .column_spacing(1)
         .style(Style::new().white())
         .header(
-            Row::new(vec!["天数", "战斗", "选择", "进度", "技能点（Gearlock）", "战利品（队伍）", "宝藏战利品（队伍）", "成功"])
+            Row::new(vec!["天数", "战斗", "选择", "进度", "奖励", "是否成功"])
                 .style(Style::new().bold())
                 .bottom_margin(1),
         )
