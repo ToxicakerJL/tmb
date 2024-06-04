@@ -2,6 +2,7 @@ use crossterm::event::{KeyCode, KeyEvent};
 use ratatui::Frame;
 use ratatui::layout::Rect;
 use ratatui::prelude::*;
+use ratatui::symbols::border;
 use ratatui::widgets::*;
 use ratatui::widgets::block::{Position, Title};
 use tokio::sync::mpsc::UnboundedSender;
@@ -11,7 +12,7 @@ use crate::app::Action;
 use crate::component::Component;
 use crate::components::game_page::ShowPopup::{BreakPopup, ChallengeSuccessfulPopup, NoPopUp};
 use crate::components::popup::Popup;
-use crate::core::game::{EncounterCard, EncounterDeck, SPECIAL_ENCOUNTER_CARDS};
+use crate::core::game::{Choice, EncounterCard, EncounterDeck, SPECIAL_ENCOUNTER_CARDS};
 use crate::core::game::ShuffleStrategy::{FirstTyrantCardTopAndShuffleRest, PickSpecialCardAndShuffle, PutCurrentCardRandom, PutCurrentCardTop, ReplaceTodayEncounterAndShuffleTodayEncounter};
 use crate::utils::centered_rect;
 
@@ -29,17 +30,25 @@ pub struct GamePage {
     popup: ShowPopup, // show the popup dialog
     selected_choice: Option<usize>, // The selected choice for the current day
     battle_logs: Vec<BattleLog>,
+    menu_select_state: TableState,
 }
 
+#[derive(Debug, Default)]
 struct BattleLog {
     success: bool,
     title: String,
     day: usize,
     progress: usize,
+    sp: usize,
+    chest_num: usize,
+    trove_chest_num: usize,
+    choice: Choice,
 }
 
 impl GamePage {
     pub fn new() -> Self {
+        let mut state = TableState::default();
+        state.select(Some(0));
         GamePage {
             name: NAME.to_string(),
             action_sender: None,
@@ -52,6 +61,7 @@ impl GamePage {
             popup: NoPopUp,
             selected_choice: None,
             battle_logs: Vec::new(),
+            menu_select_state: state,
         }
     }
 }
@@ -60,6 +70,7 @@ impl Component for GamePage {
     fn handle_key_events(&mut self, key: KeyEvent) -> color_eyre::Result<()> {
         match self.popup {
             NoPopUp => {
+                let mut idx = self.menu_select_state.selected().unwrap();
                 if key.code == KeyCode::Char('1') {
                     self.popup = if self.today_card.is_some() { ChallengeSuccessfulPopup } else { NoPopUp };
                     self.selected_choice = Some(0);
@@ -75,6 +86,18 @@ impl Component for GamePage {
                     self.selected_choice = Some(2);
                     info!("[{}] Selected choice 3", self.name);
                 }
+                if key.code == KeyCode::Up {
+                    if idx > 0 {
+                        idx -= 1;
+                    }
+                    self.menu_select_state.select(Some(idx));
+                }
+                if key.code == KeyCode::Down {
+                    if idx < self.battle_logs.len() - 1 {
+                        idx += 1;
+                    }
+                    self.menu_select_state.select(Some(idx));
+                }
             }
             ChallengeSuccessfulPopup => {
                 if key.code == KeyCode::Char('y') {
@@ -88,18 +111,20 @@ impl Component for GamePage {
                         title: today_card.title.clone(),
                         day: self.days,
                         progress: today_progress,
+                        sp: 0,
+                        chest_num: 0,
+                        trove_chest_num: 0,
+                        choice: today_card.choices[self.selected_choice.unwrap()].clone(),
                     })
                 }
                 if key.code == KeyCode::Char('n') {
                     self.popup = BreakPopup(None);
                     let today_card = self.today_card.as_ref().unwrap();
                     info!("[{}] Choice {} challenge failed", self.name, self.selected_choice.unwrap());
-                    self.battle_logs.push(BattleLog {
-                        success: false,
-                        title: today_card.title.clone(),
-                        day: self.days,
-                        progress: 0,
-                    })
+                    let mut log = BattleLog::default();
+                    log.title = today_card.title.clone();
+                    log.day = self.days;
+                    self.battle_logs.push(log);
                 }
                 if key.code == KeyCode::Char('p') {
                     self.popup = NoPopUp;
@@ -172,20 +197,13 @@ impl Component for GamePage {
     }
     fn draw(&mut self, frame: &mut Frame<'_>, area: Rect) -> color_eyre::Result<()> {
         let layout = Layout::default()
-            .direction(Direction::Horizontal)
-            .constraints(vec![
-                Constraint::Percentage(30),
-                Constraint::Percentage(70),
-            ])
-            .split(area);
-
-        let left_layout = Layout::default()
             .direction(Direction::Vertical)
             .constraints(vec![
-                Constraint::Percentage(40),
-                Constraint::Percentage(60),
+                Constraint::Percentage(18),
+                Constraint::Percentage(55),
+                Constraint::Percentage(27),
             ])
-            .split(layout[0]);
+            .split(area);
 
         let days = String::from("Days: ") + self.days.to_string().as_str();
         let progress = String::from("Progress: ") + self.progress.to_string().as_str();
@@ -200,21 +218,10 @@ impl Component for GamePage {
             .alignment(Alignment::Center)
             .build()?;
 
-        let mut items = Vec::new();
-        for log in self.battle_logs.iter() {
-            if log.success {
-                let day = format!("✅ 第{}天：{}  获取进度: {}", log.day, log.title, log.progress);
-                items.push(day);
-            } else {
-                let day = format!("❌ 第{}天：{}  获取进度: {}", log.day, log.title, log.progress);
-                items.push(day);
-            }
-        }
-        let list = List::new(items)
-            .direction(ListDirection::TopToBottom);
+        let table = build_battle_log_menu(&self.battle_logs);
 
-        frame.render_widget(days_banner, left_layout[0]);
-        frame.render_widget(list, left_layout[1]);
+        frame.render_widget(days_banner, layout[0]);
+        frame.render_stateful_widget(table, layout[2], &mut self.menu_select_state);
 
         let deck = self.deck.as_mut().unwrap();
         let content;
@@ -271,7 +278,9 @@ impl Component for GamePage {
         frame.render_widget(
             Paragraph::new(content)
                 .wrap(Wrap { trim: true })
-                .block(Block::new().borders(Borders::ALL).title(instruction.alignment(Alignment::Center).position(Position::Bottom))),
+                .block(Block::new().borders(Borders::ALL)
+                    .border_set(border::THICK)
+                    .title(instruction.alignment(Alignment::Center).position(Position::Top))),
             layout[1]);
 
         match &self.popup {
@@ -321,6 +330,50 @@ fn build_encounter_content(card: &EncounterCard, days: usize) -> String {
         content = content + format!("* 选择{}：获取{}进度。\n", idx + 1, p).as_str();
     }
     content
+}
+
+fn build_battle_log_menu(battle_log: &Vec<BattleLog>) -> Table {
+    let mut rows: Vec<Row> = Vec::new();
+    for log in battle_log {
+        let r = Row::new(vec![log.day.to_string(),
+                              log.title.clone(),
+                              log.choice.description.clone(),
+                              log.progress.to_string(),
+                              log.sp.to_string(),
+                              log.chest_num.to_string(),
+                              log.trove_chest_num.to_string(),
+                              if log.success { "✅".to_string() } else { "❌".to_string() }]).height(1);
+        rows.push(r);
+    }
+    let widths = [
+        Constraint::Length(10),
+        Constraint::Length(20),
+        Constraint::Max(100),
+        Constraint::Length(10),
+        Constraint::Length(20),
+        Constraint::Length(20),
+        Constraint::Length(20),
+        Constraint::Length(10)
+    ];
+
+    let block = Block::default()
+        .title(Title::from(" <Enter> 键回滚".bold()).alignment(Alignment::Center).position(Position::Bottom))
+        .borders(Borders::ALL)
+        .padding(Padding::top(1))
+        .border_set(border::THICK);
+
+    let table = Table::new(rows, widths)
+        .column_spacing(1)
+        .style(Style::new().white())
+        .header(
+            Row::new(vec!["天数", "战斗", "选择", "进度", "技能点（Gearlock）", "战利品（队伍）", "宝藏战利品（队伍）", "成功"])
+                .style(Style::new().bold())
+                .bottom_margin(1),
+        )
+        .block(block)
+        .highlight_style(Style::new().yellow())
+        .highlight_symbol(" >> ");
+    table
 }
 
 enum ShowPopup {

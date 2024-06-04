@@ -123,7 +123,7 @@ pub struct EncounterCard {
     pub card_type: String,
 }
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize, Clone, Default)]
 pub struct Choice {
     pub description: String,
     pub action: String,
