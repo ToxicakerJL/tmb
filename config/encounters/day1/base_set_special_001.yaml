@@ -3,10 +3,9 @@ story: 离黎明还有12小时，送别仪式无疑会改变每个幸存Gearloc�
 choices:
   - description: 挤出最后的时间进行自我提升。
     action:
-    rewards: 每个Gearlock获得2个技能点。
+    rewards: 每个Gearlock获得2个技能点。获取1点进度点。
   - description: 搜查一个阴暗的小贩！
     action:
-    rewards: 每个Gearloc可以抽取2个战利品，并选择1个保留。每个Gearlock获得1个技能点。
+    rewards: 每个Gearloc可以抽取2个战利品，并选择1个保留。每个Gearlock获得1个技能点。获取1点进度点。
 remark:
 progress: [1,1]
-card_type: day1

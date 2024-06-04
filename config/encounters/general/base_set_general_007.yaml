@@ -8,5 +8,5 @@ choices:
     action: BQ：反派点数。每个Gearloc在战斗中减少1点敏捷。此外，在移动之前，你必须掷一个D6骰子。如果掷到1-3，你会被困住，无法在本回合移动。
     rewards: 每个Gearlock获得2个技能点。每个Gearloc可以抽取1个战利品。获取1点进度点。
 remark:
-progress: [1,1]
+progress: [2,1]
 card_type: general
