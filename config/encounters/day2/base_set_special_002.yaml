@@ -4,7 +4,7 @@ choices:
   - description: 呼叫守卫帮忙。
     action: BQ：反派点数。每回合开始时，城墙上的箭对每个反派造成1点真实伤害。推荐给第一次冒险者。
     rewards: 每个Gearlock获得1个技能点。每个Gearlock抽取1个战利品。获取1点进度点。
-  - description: 是时候让奥本达看看Gearloc的实力了。在奥本达的注视下，你感受到一股额外的肾上腺素，准备进行一场无援战斗。
+  - description: 是时候让奥本达看看Gearlock的实力了。在奥本达的注视下，你感受到一股额外的肾上腺素，准备进行一场无援战斗。
     action: BQ：反派点数。
     rewards: 每个Gearlock获得2个技能点。每个Gearlock抽取1个战利品。获取1点进度点。
 remark: 如果战斗失败，将这次遭遇放回遭遇卡组顶部。

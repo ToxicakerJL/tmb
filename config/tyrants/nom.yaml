@@ -8,7 +8,7 @@ battle_title: 与诺姆斗殴
 creatures: 巨魔，鳞片怪，兽人
 battle_mechanism:
 - BQ：反派点数（1人队伍忽略此项）。将诺姆添加到BQ底部。
-- 战斗垫上一次只能有一个Gearloc！Gearlocs决定谁先进入战斗垫，其余在一旁等待。当Gearloc被击倒时，下一个Gearloc将在回合结束后选择一个战斗垫的起始位置和并把自己的速度骰放在速度Meter首位！
+- 战斗垫上一次只能有一个Gearlock！Gearlocks决定谁先进入战斗垫，其余在一旁等待。当Gearlock被击倒时，下一个Gearloc将在回合结束后选择一个战斗垫的起始位置和并把自己的速度骰放在速度Meter首位！
 tyrant_skills:
 - 厚皮3：诺姆每回合忽略他将受到的前3点伤害（不忽略真实伤害）。
 - 恢复1：诺姆在其行动开始前获得1点生命值（最高到最大值）。
