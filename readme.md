@@ -12,4 +12,6 @@ This is a support program for my favorite board game: Too Many Bones. Current su
 cargo run
 ```
 # Demo
-![Demo](demo.gif)
+![Demo](https://github.com/ToxicakerJL/tmb/assets/148095065/8f3fc645-1a27-4793-b3a2-851036e398c5)
+
+[Demo](https://github.com/ToxicakerJL/tmb/blob/master/demo.gif)
